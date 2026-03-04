@@ -1,0 +1,1 @@
+# smart_school_project
