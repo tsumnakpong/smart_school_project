@@ -1,0 +1,266 @@
+/* --------------------------------------------------
+   1. GLOBAL VARIABLES (จุดเดียวเปลี่ยนทั้งเว็บ)
+   -------------------------------------------------- */
+:root {
+    --primary-font: 'THSarabunNew', 'Sarabun', sans-serif;
+    --base-font-size: 18px;
+    
+    /* Palette - Light */
+    --liquid-day-bg: #F8FAFC;
+    --liquid-day-text: #334155;
+    
+    /* Palette - Night */
+    --dark-bg: #121417;
+    --dark-card: rgba(30, 33, 38, 0.85);
+    --dark-text: #CBD5E1;
+    --dark-border: rgba(255, 255, 255, 0.08);
+    
+       /* โทนส้มอุ่นแบบพรีเมียม (ช่วยลดแสงสีฟ้าได้ดีกว่า Sepia มาตรฐาน) */
+    --eye-comfort-overlay: rgba(255, 160, 0, 0.12); 
+    --eye-comfort-filter: sepia(35%) contrast(92%) brightness(96%);
+    
+    /* Semantic */
+    --islam-green: #4CAF50;
+    --islam-gold: #FFA000;
+    
+    /* Effects */
+    --liquid-radius: 2.5rem;
+    --liquid-transition: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    --eye-comfort-filter: sepia(35%) contrast(92%) brightness(95%);
+}
+
+/* --------------------------------------------------
+   2. BASE STYLES & TRANSITIONS
+   -------------------------------------------------- */
+* {
+    -webkit-tap-highlight-color: transparent; /* ลบแถบสีเวลาจิ้มบนมือถือ */
+}
+
+body, html {
+    font-family: var(--primary-font) !important;
+    font-size: var(--base-font-size);
+    line-height: 1.65;
+    background-color: var(--liquid-day-bg);
+    color: var(--liquid-day-text);
+    overflow-x: hidden;
+}
+
+/* ⚡️ หัวใจสำคัญ: การเปลี่ยนโหมดให้นุ่มนวลแบบ Global */
+html.theme-transition, 
+html.theme-transition body,
+html.eye-comfort-transition,
+html.eye-comfort-transition body {
+    transition: background-color 0.7s var(--liquid-transition), 
+                color 0.7s var(--liquid-transition), 
+                filter 0.7s var(--liquid-transition) !important;
+}
+
+/* --------------------------------------------------
+   3. DARK MODE & EYE COMFORT
+   -------------------------------------------------- */
+/* --------------------------------------------------
+   3.1. TRANSITION SETUP (หัวใจสำคัญของความนุ่มนวล)
+   -------------------------------------------------- */
+/* ใส่ transition ให้กับ properties ที่มีการเปลี่ยนแปลงบ่อย */
+body, .liquid-card, nav, aside, .nav-blur, #slide-up-menu {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.5s ease, 
+                color 0.3s ease,
+                box-shadow 0.5s ease !important;
+}
+
+/* --------------------------------------------------
+   3.2. DARK MODE STYLES (เน้นความลึกและมิติ)
+   -------------------------------------------------- */
+/* เมื่อ html มีคลาส .dark */
+html.dark {
+    color-scheme: dark; /* บอก Browser ว่าเราใช้โหมดมืด (ช่วยเรื่อง Scrollbar) */
+}
+
+html.dark body {
+    background-color: var(--dark-bg) !important;
+    color: var(--dark-text) !important;
+}
+
+/* ปรับปรุง Card ในโหมดมืดให้มีมิติ (Layering) */
+html.dark .liquid-card, 
+html.dark .m3-card {
+    background: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    backdrop-filter: blur(25px) saturate(150%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* --------------------------------------------------
+   3.3. ICON & UI ELEMENT ANIMATION
+   -------------------------------------------------- */
+/* อนิเมชั่นตอนสลับไอคอน Sun/Moon */
+.theme-toggle-icon {
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                color 0.4s ease;
+}
+
+/* เอฟเฟกต์หมุนเบาๆ เวลาเปลี่ยนโหมด */
+.dark .theme-toggle-icon {
+    transform: rotate(360deg);
+    color: #FACC15; /* สีเหลือง Sun ในโหมดมืด */
+}
+
+/* --------------------------------------------------
+   3.4. FIX: ป้องกันสีขาววาบ (Flash of Unstyled Content)
+   -------------------------------------------------- */
+/* บังคับสีพื้นหลังของ HTML ให้ตรงกับโหมดเพื่อกันจอขาวตอนโหลดหน้า */
+html {
+    background-color: var(--liquid-day-bg);
+}
+html.dark {
+    background-color: var(--dark-bg);
+}
+
+/* โหมดถนอมสายตา (ใส่ที่ HTML เท่านั้น) */
+html.eye-comfort {
+    filter: var(--eye-comfort-filter) !important;
+}
+
+/* ป้องกันภาพวิดีโอเพี้ยน */
+html.eye-comfort img, 
+html.eye-comfort video,
+html.eye-comfort .no-filter {
+    filter: sepia(0%) brightness(105%) !important;
+}
+
+
+/* --------------------------------------------------
+   1. EYE COMFORT VARIABLES (ปรับโทนสีให้นุ่มนวล)
+   -------------------------------------------------- */
+
+
+/* --------------------------------------------------
+   2. SELECTIVE FILTERING (แก้ปัญหา Sidebar/Botbar ล็อก)
+   -------------------------------------------------- */
+/* ❌ หลีกเลี่ยงการใส่ filter ที่ html ตรงๆ ถ้ามี elements ที่เป็น position: fixed เยอะ
+   ✅ แนะนำให้ใส่ที่ส่วนเนื้อหาหลัก (Main Content) */
+
+html.eye-comfort main, 
+html.eye-comfort .content-area,
+html.eye-comfort #app-body {
+    filter: var(--eye-comfort-filter) !important;
+    transition: filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------
+   3. EXCEPTION (ยกเว้นส่วนที่ไม่ควรติดโทนเหลือง)
+   -------------------------------------------------- */
+/* ป้องกันภาพถ่าย, วิดีโอ หรือแผนที่ เพี้ยนจนเกินไป */
+html.eye-comfort img, 
+html.eye-comfort video, 
+html.eye-comfort iframe {
+    filter: sepia(0%) brightness(104%) !important;
+    transition: filter 0.8s ease;
+}
+
+/* --------------------------------------------------
+   4. UI PROTECTION (ปกป้อง Sidebar/Botbar)
+   -------------------------------------------------- */
+/* มั่นใจว่าส่วนควบคุมเว็บ (Nav/Sidebar) จะไม่โดน Filter บังจนกดไม่ได้ */
+nav, aside, .botbar, #slide-up-menu {
+    filter: none !important;
+    z-index: 2001; /* ดันให้อยู่เหนือ layer ที่ติด filter */
+}
+
+/* --------------------------------------------------
+   5. OPTIONAL: FULL-SCREEN OVERLAY (ทางเลือกสำรอง)
+   -------------------------------------------------- */
+/* ถ้าคุณอยากให้เหลืองทั้งจอรวมถึงพื้นหลัง แต่ไม่ใช้ filter 
+   วิธีนี้จะไม่ทำให้ Sidebar ล็อก */
+html.eye-comfort::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: var(--eye-comfort-overlay);
+    pointer-events: none; /* สำคัญมาก: เพื่อให้ยังกดปุ่มข้างล่างได้ */
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+}
+
+
+
+/* --------------------------------------------------
+   4. LIQUID COMPONENTS (Cards)
+   -------------------------------------------------- */
+.liquid-card, .m3-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--liquid-radius);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+
+.liquid-card:active { transform: scale(0.96); } /* เอฟเฟกต์ปุ่มยุบ */
+
+.dark .liquid-card, .dark .m3-card {
+    background: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --------------------------------------------------
+   5. SLIDE-UP MENU (Muslim Pro Style)
+   -------------------------------------------------- */
+#slide-up-menu {
+    position: fixed !important;
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    z-index: 2000; /* สูงสุด */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(30px) saturate(200%);
+    border-radius: var(--liquid-radius) var(--liquid-radius) 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: none;
+    
+    /* ซ่อนใต้จอ */
+    transform: translateY(105%);
+    transition: transform 0.6s var(--liquid-transition);
+    visibility: hidden;
+}
+
+#slide-up-menu.active {
+    transform: translateY(0);
+    visibility: visible;
+    box-shadow: 0 -10px 50px rgba(0,0,0,0.1);
+}
+
+.dark #slide-up-menu {
+    background: rgba(20, 22, 25, 0.98) !important;
+    border-top: 1px solid var(--dark-border);
+}
+
+/* Backdrop พื้นหลังเวลาเมนูเปิด */
+.menu-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    z-index: 1999;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.5s ease;
+}
+.menu-backdrop.active { opacity: 1; visibility: visible; }
+
+/* --------------------------------------------------
+   6. NAVIGATION (Sticky Glass)
+   -------------------------------------------------- */
+.nav-blur {
+    position: sticky; top: 0; z-index: 1000;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .nav-blur {
+    background: rgba(18, 20, 23, 0.8) !important;
+    border-bottom: 1px solid var(--dark-border);
+}
+

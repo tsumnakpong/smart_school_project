@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-6 bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
+    <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-bold text-indigo-700">ความคืบหน้าการเช็คชื่อ</span>
+        <span id="attendance-count" class="text-xs font-bold text-indigo-600">
+            มาแล้ว {{ present_list|length }} จาก {{ students|length }} คน
+        </span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-3">
+        <div id="progress-bar" 
+             class="bg-indigo-600 h-3 rounded-full transition-all duration-500" 
+             style="width: {% widthratio present_list|length students|length 100 %}%">
+        </div>
+    </div>
+</div>
+<div class="max-w-2xl mx-auto py-10 px-4">
+    <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">กล้องสแกนเช็คชื่อ 📷</h1>
+        <p class="text-blue-600 font-semibold">{{ schedule.subject.name_th }} (ห้อง {{ schedule.classroom.name }})</p>
+    </div>
+
+    <div id="reader" class="overflow-hidden rounded-3xl shadow-2xl bg-black border-4 border-white"></div>
+
+    <div id="result-box" class="mt-6 p-4 rounded-2xl hidden transition-all duration-300 text-center">
+        <p id="result-msg" class="font-bold text-lg"></p>
+        <p id="result-time" class="text-sm opacity-80"></p>
+    </div>
+
+    <div class="mt-10 bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800">รายชื่อนักเรียน</h2>
+            <span class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold">
+                ทั้งหมด {{ students|length }} คน
+            </span>
+        </div>
+        
+        <div class="space-y-3">
+            {% for profile in students %}
+            <div id="row-{{ profile.student_id }}" class="flex items-center justify-between p-4 {% if profile.user.id in present_list %}bg-green-50{% else %}bg-gray-50{% endif %} rounded-2xl transition-colors duration-300">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                        {{ forloop.counter }}
+                    </div>
+                    <div>
+<p class="text-sm font-bold text-gray-800">
+    {% if profile.user.first_name %}
+        {{ profile.user.first_name }} {{ profile.user.last_name }}
+    {% else %}
+        {{ profile.user.username }} (ไม่ได้ตั้งชื่อ)
+    {% endif %}
+</p>
+                    </div>
+                </div>
+                
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" 
+                           id="toggle-{{ profile.student_id }}"
+                           class="sr-only peer" 
+                           {% if profile.user.id in present_list %}checked{% endif %}
+                           onchange="updateAttendance('{{ profile.student_id }}', this.checked ? 'present' : 'absent')">
+                    <div class="w-12 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="text-center mt-8">
+        <a href="{% url 'lms:view_schedule' %}" class="text-gray-500 underline text-sm">กลับไปหน้าตารางเรียน</a>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    // ฟังก์ชันหลักในการส่งข้อมูลไป Backend
+    function updateAttendance(studentId, status) {
+        const resultBox = document.getElementById('result-box');
+        const resultMsg = document.getElementById('result-msg');
+        const row = document.getElementById(`row-${studentId}`);
+        const toggle = document.getElementById(`toggle-${studentId}`);
+
+        fetch("", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `student_id=${studentId}&status=${status}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // อัปเดต UI เมื่อสแกนติดหรือกดปุ่ม
+                resultBox.className = "mt-6 p-4 rounded-2xl bg-green-100 text-green-700 shadow-sm block";
+                resultMsg.innerText = `✅ ${status === 'present' ? 'เช็คชื่อสำเร็จ' : 'ยกเลิกสำเร็จ'}: ${data.name}`;
+                document.getElementById('result-time').innerText = `เวลา: ${data.time}`;
+                
+                // เปลี่ยนสีแถวและสถานะ Toggle
+                row.className = `flex items-center justify-between p-4 ${status === 'present' ? 'bg-green-50' : 'bg-gray-50'} rounded-2xl transition-colors duration-300`;
+                toggle.checked = (status === 'present');
+
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                resultBox.className = "mt-6 p-4 rounded-2xl bg-red-100 text-red-700 block";
+                resultMsg.innerText = `❌ ${data.message}`;
+            }
+        });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        // เมื่อสแกนติด ให้เรียกใช้ฟังก์ชันอัปเดตสถานะเป็น 'present'
+        updateAttendance(decodedText, 'present');
+    }
+
+    // ตั้งค่ากล้อง
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 15, qrbox: {width: 250, height: 250} }
+    );
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+{% endblock %}

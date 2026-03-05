@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 1. คุมโทนกล่องแชท AI */
+    .ai-bubble-container {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        border-bottom-left-radius: 0;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        color: #1f2937;
+    }
+
+    /* 2. จัดการตัวหนาและหัวข้อ */
+    .prose strong { font-weight: 800 !important; color: #111827 !important; }
+    .prose h1, .prose h2, .prose h3 { 
+        font-weight: 700 !important; 
+        color: #1e40af !important; 
+        margin-top: 1.5rem !important; 
+        margin-bottom: 0.75rem !important;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.25rem;
+    }
+
+    /* 3. จัดการตาราง (Table) ให้สวยเหมือนในรูปที่คุณส่งมา */
+    .prose table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin: 1rem 0; 
+        font-size: 0.9rem;
+    }
+    .prose th { 
+        background-color: #f8fafc; 
+        border: 1px solid #e2e8f0; 
+        padding: 8px 12px; 
+        text-align: left; 
+        font-weight: bold;
+    }
+    .prose td { 
+        border: 1px solid #e2e8f0; 
+        padding: 8px 12px; 
+    }
+    .prose tr:nth-child(even) { background-color: #f9fafb; }
+
+    /* 4. จัดการรายการ (Lists) */
+    .prose ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin: 1rem 0 !important; }
+    .prose li { margin-bottom: 0.5rem !important; }
+
+    /* 5. เส้นคั่น (Horizontal Rule) */
+    .prose hr { border: 0; border-top: 2px solid #f1f5f9; margin: 1.5rem 0; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div class="lg:w-2/3">
+            <nav class="text-sm mb-4">
+                <a href="{% url 'lms:student_dashboard' %}" class="text-blue-600">Dashboard</a> / 
+                <span class="text-gray-500">{{ lesson.course.subject.name_th }}</span>
+            </nav>
+            
+            <h1 class="text-3xl font-bold mb-6">{{ lesson.title }}</h1>
+            
+
+
+            <div class="prose max-w-none bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                {{ lesson.content|safe }}
+            </div>
+        </div>
+
+
+        {% if lesson.enable_video and lesson.video_url %}
+    <div class="video-container mb-6">
+                    {% if lesson.video_url %}
+            <div class="aspect-video mb-8 rounded-xl overflow-hidden shadow-lg">
+                <iframe 
+    src="{{ lesson.video_url|safe }}" 
+    width="100%" 
+    height="450" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin" 
+    allowfullscreen>
+</iframe>
+            </div>
+            {% endif %}
+        </div>
+{% endif %}
+
+{% if lesson.enable_ai_chat %}
+    <div id="ai-chat-section">
+                    <div class="bg-indigo-900 text-white rounded-xl shadow-xl p-6 mb-6 sticky top-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">AI Tutor (ครูอัจฉริยะ)</h3>
+                        <p class="text-xs opacity-75">สงสัยตรงไหน ถามครูได้ 24 ชม.</p>
+                    </div>
+                </div>
+                
+                <div id="chat-box" class="h-64 overflow-y-auto mb-4 text-sm space-y-3 pr-2">
+                    <div class="bg-indigo-800 p-3 rounded-lg italic text-indigo-200">
+                        "อัสลามูอาลัยกุมครับ มีตรงไหนในบทเรียนนี้ที่คุณยังไม่เข้าใจไหม?"
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-2">
+    <h3 class="text-sm font-bold text-indigo-400">คุยกับครู AI</h3>
+    <button onclick="clearChat()" class="text-xs text-red-400 hover:text-red-300 transition-colors">
+        <i class="fa-solid fa-trash-can mr-1"></i> ล้างประวัติการแชท
+    </button>
+</div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="ai-input" placeholder="พิมพ์คำถามที่นี่..." 
+                           class="flex-1 bg-indigo-800 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400">
+                    <button class="bg-indigo-500 px-3 py-2 rounded-lg hover:bg-indigo-400"onclick="sendMessage()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+{% else %}
+    <div class="p-4 bg-gray-100 text-gray-500 rounded-lg italic">
+        * บทเรียนนี้ไม่ได้เปิดใช้งานระบบปรึกษา AI *
+    </div>
+{% endif %}
+
+{% if lesson.enable_quiz %}
+    <button onclick="startQuiz()" class="bg-orange-500 ...">
+        📝 เริ่มทำแบบทดสอบ (AI Quiz)
+    </button>
+    <div id="quiz-container" class="hidden mt-6 bg-white p-6 rounded-xl shadow-lg border-2 border-orange-200">
+    <div id="quiz-content"></div>
+    <button id="submit-quiz" class="hidden bg-green-600 text-white px-6 py-2 rounded-lg mt-4">ส่งคำตอบ</button>
+</div>
+{% endif %}
+
+        <div class="lg:w-1/3">
+
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <h3 class="font-bold mb-4">หัวข้อทั้งหมดในวิชานี้</h3>
+                <div class="space-y-2">
+                    {% for l in course_lessons %}
+                    <a href="{% url 'lms:lesson_detail' l.id %}" 
+                       class="block p-3 rounded-lg text-sm {% if l.id == lesson.id %} bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600 {% else %} hover:bg-gray-50 text-gray-600 {% endif %}">
+                        {{ forloop.counter }}. {{ l.title }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const lessonId = "{{ lesson.id }}";
+    const chatBox = document.getElementById('chat-box');
+    const input = document.getElementById('ai-input');
+
+    async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        // 1. แสดงข้อความของนักเรียนทันที
+        chatBox.innerHTML += `
+            <div class="flex flex-col items-end mb-4">
+                <span class="text-xs text-gray-500 mb-1 mr-2">คุณ</span>
+                <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-br-none shadow-sm max-w-[85%]">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // 2. แสดงสถานะกำลังโหลด (Loading)
+        const loadingId = 'loading-' + Date.now();
+        chatBox.innerHTML += `
+            <div id="${loadingId}" class="flex flex-col items-start mb-6">
+                <span class="text-xs font-semibold text-indigo-600 mb-1 ml-2">ครู AI อัจฉริยะ</span>
+                <div class="ai-bubble-container shadow-sm border border-gray-100 p-3 bg-gray-50 rounded-lg italic text-gray-400 text-sm">
+                    กำลังประมวลผลคำตอบ...
+                </div>
+            </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // 3. เรียก API ไปหา Django
+            const response = await fetch(`/lms/ai-chat/${lessonId}/`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: new URLSearchParams({ 'message': message })
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            
+            // 4. แปลง Markdown เป็น HTML (ต้องทำหลังได้ data มาแล้ว)
+            let formattedReply;
+            if (typeof marked !== 'undefined') {
+                formattedReply = marked.parse(data.reply);
+            } else {
+                formattedReply = data.reply.replace(/\n/g, '<br>');
+            }
+
+            // 5. ลบสถานะ Loading และแสดงคำตอบจริง
+            const loadingElem = document.getElementById(loadingId);
+            if (loadingElem) {
+                loadingElem.innerHTML = `
+                    <span class="text-xs font-semibold text-indigo-600 mb-1 ml-2">ครู AI อัจฉริยะ</span>
+                    <div class="ai-bubble-container prose max-w-full">
+                        ${formattedReply}
+                    </div>
+                `;
+            }
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        } catch (error) {
+            console.error("Error:", error);
+            const loadingElem = document.getElementById(loadingId);
+            if (loadingElem) loadingElem.innerHTML = `<span class="text-red-500 text-xs">เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะจ๊ะ</span>`;
+        }
+    }
+
+    input.addEventListener('keypress', (e) => { 
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+async function clearChat() {
+    if (confirm("คุณครูจะลืมสิ่งที่เราคุยกันก่อนหน้านี้ทั้งหมด ต้องการล้างประวัติจริงๆ ใช่ไหมจ๊ะ?")) {
+        try {
+            // 1. เรียกไปที่ Backend เพื่อลบ Session
+            const response = await fetch(`/lms/clear-chat/${lessonId}/`);
+            
+            if (response.ok) {
+                // 2. ลบข้อความที่แสดงอยู่บนหน้าจอ
+                document.getElementById('chat-box').innerHTML = `
+                    <div class="text-center text-gray-500 text-xs my-4">
+                        --- เริ่มต้นการสนทนาใหม่ ---
+                    </div>
+                `;
+                console.log("ล้างประวัติการแชทในระบบเรียบร้อยแล้ว");
+            }
+        } catch (error) {
+            console.error("Error clearing chat:", error);
+        }
+    }
+}
+let currentQuizData = [];
+
+async function startQuiz() {
+    const container = document.getElementById('quiz-container');
+    const content = document.getElementById('quiz-content');
+    container.classList.remove('hidden');
+    content.innerHTML = "กำลังเตรียมข้อสอบโดย AI...";
+    try {
+        const response = await fetch(`/lms/generate-quiz/${lessonId}/`);
+        if (response.status === 429) {
+                    content.innerHTML = "⚠️ คุณครู AI กำลังพักประมวลผล (Quota Full) อีกประมาณ 1 นาทีค่อยกดใหม่นะจ๊ะ";
+                    return;
+                }
+                
+                const data = await response.json();
+                // ... โค้ดแสดงข้อสอบเดิม ...
+            } catch (error) {
+                content.innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อสอบจ้ะ";
+            }
+        }
+
+function renderQuiz() {
+    const content = document.getElementById('quiz-content');
+    let html = '';
+    currentQuizData.forEach((q, idx) => {
+        html += `
+            <div class="mb-6 p-4 border-b">
+                <p class="font-bold mb-3">${idx+1}. ${q.question}</p>
+                ${q.options.map((opt, optIdx) => `
+                    <label class="block mb-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <input type="radio" name="q${idx}" value="${optIdx}" class="mr-2"> ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+    });
+    content.innerHTML = html;
+    document.getElementById('submit-quiz').classList.remove('hidden');
+}
+async function submitQuiz() {
+    let score = 0;
+    const total = currentQuizData.length;
+
+    currentQuizData.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+            score++;
+        }
+    });
+
+    // แสดงผลคะแนนให้นักเรียนดู
+    alert(`คุณทำได้ ${score} จาก ${total} คะแนนจ้ะ!`);
+
+    // ส่งคะแนนไปบันทึกที่ Backend
+    await fetch(`/lms/save-quiz-score/${lessonId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ score: score, total: total })
+    });
+
+    // ปิดหน้าจอ Quiz และล้างข้อมูล
+    document.getElementById('quiz-container').classList.add('hidden');
+}
+
+// ผูกฟังก์ชันกับปุ่มส่งคำตอบ
+document.getElementById('submit-quiz').onclick = submitQuiz;
+</script>
+{% endblock %}
+

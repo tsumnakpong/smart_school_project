@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+<div class="mb-8 flex flex-wrap gap-2">
+    <a href="?" class="px-4 py-2 rounded-full border {% if not selected_class %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-600 border-gray-200 hover:border-indigo-400{% endif %} transition-all text-sm font-medium">
+        ดูทั้งหมด
+    </a>
+    {% for cls in class_overview %}
+    <a href="?classroom={{ cls.classroom }}" class="px-4 py-2 rounded-full border {% if selected_class == cls.classroom %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-gray-600 border-gray-200 hover:border-indigo-400{% endif %} transition-all text-sm font-medium">
+        ห้อง {{ cls.classroom }} (เฉลี่ย {{ cls.avg_overall|stringformat:".2f" }})
+    </a>
+    {% endfor %}
+</div>
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    📊 Teacher AI Dashboard
+                </h1>
+                <p class="mt-2 text-sm text-gray-600">
+                    ติดตามการเรียนรู้และวิเคราะห์คำถามของนักเรียนผ่านระบบครู AI
+                </p>
+            </div>
+<div class="mt-4 md:mt-0 flex space-x-2">
+    <button onclick="window.location.reload()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+        🔄 รีเฟรช
+    </button>
+    
+    <a href="{% url 'lms:teacher_dashboard_export' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none ring-2 ring-offset-2 ring-green-500">
+        📥 ส่งออกเป็น Excel
+    </a>
+</div>
+        </div>
+
+                        <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                    <a href="{% url 'lms:view_schedule' %}"class="flex items-center justify-center w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transform group-hover:-translate-y-1 transition-all shadow-md">📅 ตารางสอน</a>
+                </div>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-indigo-500">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">คำถามทั้งหมดในวันนี้</dt>
+                    <dd class="mt-1 text-3xl font-semibold text-indigo-600">{{ logs.count }}</dd>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-green-500">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">นักเรียนที่ใช้งานล่าสุด</dt>
+                    <dd class="mt-1 text-3xl font-semibold text-green-600">{{ logs.0.student.username|default:"-" }}</dd>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-500">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">บทเรียนที่ถูกถามล่าสุด</dt>
+                    <dd class="mt-1 text-lg font-semibold text-orange-600 truncate">{{ logs.0.lesson.title|default:"-" }}</dd>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
+            <div class="px-4 py-5 border-b border-gray-200 sm:px-6 bg-gray-50">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    💬 ประวัติการสนทนาล่าสุด
+                </h3>
+            </div>
+            <ul class="divide-y divide-gray-200">
+                {% for log in logs %}
+                <li class="p-6 hover:bg-gray-50 transition duration-150">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold">
+                                {{ log.student.username|slice:":1"|upper }}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-bold text-gray-900">{{ log.student.username }}</div>
+                                <div class="text-xs text-gray-500">{{ log.timestamp|date:"d M Y | H:i" }}</div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                            {{ log.lesson.title }}
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                            <span class="text-xs font-bold text-blue-600 uppercase">คำถามนักเรียน:</span>
+                            <p class="mt-1 text-sm text-gray-700 leading-relaxed">{{ log.question }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <span class="text-xs font-bold text-gray-500 uppercase">คำตอบจาก AI:</span>
+                            <p class="mt-1 text-sm text-gray-600 leading-relaxed italic">
+                                {{ log.answer|truncatechars:150 }}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="p-10 text-center text-gray-500">
+                    ยังไม่มีข้อมูลการสนทนาในขณะนี้
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+<h2 class="text-xl font-bold mt-10 mb-4 text-gray-800 flex items-center">
+    <span class="mr-2">📝</span> สรุปผลการทดสอบ (Quiz Analytics)
+</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">คะแนนเฉลี่ยรายบทเรียน</h3>
+        <div class="space-y-4">
+            {% for stat in quiz_stats %}
+            <div>
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="font-medium text-gray-700">{{ stat.lesson__title }}</span>
+                    <span class="text-indigo-600 font-bold">{{ stat.avg_score|stringformat:".2f" }} คะแนน</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                <!-- <div class="bg-indigo-500 h-2 rounded-full" style="width: {% widthratio stat.avg_score 5 100 %}%"></div> -->
+                </div>
+                <p class="text-[10px] text-gray-400 mt-1">นักเรียนเข้าทำ: {{ stat.student_count }} คน | คะแนนสูงสุด: {{ stat.max_score }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">คะแนนล่าสุดรายบุคคล</h3>
+        <div class="overflow-y-auto max-h-[300px]">
+            <table class="w-full text-left text-sm">
+                <thead class="sticky top-0 bg-white border-b">
+                    <tr>
+                        <th class="pb-2 text-gray-400">ชื่อนักเรียน</th>
+                        <th class="pb-2 text-gray-400 text-center">คะแนน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in student_scores %}
+                    <tr class="border-b last:border-0">
+                        <td class="py-3">
+                            <p class="font-bold text-gray-800">{{ score.student.username }}</p>
+                            <p class="text-xs text-gray-400">{{ score.lesson.title }}</p>
+                        </td>
+                        <td class="py-3 text-center">
+                            <span class="px-2 py-1 rounded text-xs font-bold {% if score.score >= 3 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                {{ score.score }}/{{ score.total_questions }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        
+<div class="mb-6 flex gap-2">
+    <a href="?classroom=" class="px-4 py-2 bg-gray-200 rounded-lg text-sm">ทั้งหมด</a>
+    {% for stat in class_stats %}
+        <a href="?classroom={{ stat.classroom }}" 
+           class="px-4 py-2 {% if selected_class == stat.classroom %}bg-indigo-600 text-white{% else %}bg-white text-gray-700{% endif %} rounded-lg shadow-sm text-sm border">
+            ห้อง {{ stat.classroom }}
+        </a>
+    {% endfor %}
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    {% for stat in class_stats %}
+    <div class="bg-white p-4 rounded-xl shadow border-l-4 border-indigo-500">
+        <h4 class="text-xs font-bold text-gray-400 uppercase">ห้อง {{ stat.classroom }}</h4>
+        <p class="text-2xl font-bold text-gray-800">{{ stat.avg_score|stringformat:".2f" }} <span class="text-sm font-normal text-gray-500">คะแนนเฉลี่ย</span></p>
+        <p class="text-xs text-indigo-500">นักเรียนสอบแล้ว {{ stat.student_count }} คน</p>
+    </div>
+    {% endfor %}
+</div>
+
+    </div>
+</div>
+{% endblock %}

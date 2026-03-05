@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">📊 รายงานสถิติการเข้าเรียน</h1>
+            <p class="text-gray-500">ห้อง: {{ classroom.name }} ประจำเดือน {{ month_name }}</p>
+        </div>
+        
+        <form method="GET" class="flex gap-2">
+            <select name="month" class="rounded-xl border-gray-200 text-sm">
+                {% for m in months %}
+                    <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>เดือนที่ {{ m }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">ดูข้อมูล</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600">นักเรียน</th>
+                    <th class="px-6 py-4 text-sm font-bold text-center text-green-600">มา</th>
+                    <th class="px-6 py-4 text-sm font-bold text-center text-yellow-600">สาย</th>
+                    <th class="px-6 py-4 text-sm font-bold text-center text-blue-600">ลา</th>
+                    <th class="px-6 py-4 text-sm font-bold text-center text-red-600">ขาด</th>
+                    <th class="px-6 py-4 text-sm font-bold text-center text-gray-600">ร้อยละการเข้าเรียน</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for item in report_data %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <span class="font-bold text-gray-800">{{ item.student.user.get_full_name }}</span>
+                        <p class="text-xs text-gray-400">เลขประจำตัว: {{ item.student.student_id }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center font-bold text-green-600">{{ item.stats.present }}</td>
+                    <td class="px-6 py-4 text-center font-bold text-yellow-600">{{ item.stats.late }}</td>
+                    <td class="px-6 py-4 text-center font-bold text-blue-600">{{ item.stats.leave }}</td>
+                    <td class="px-6 py-4 text-center font-bold text-red-600">{{ item.stats.absent }}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center">
+                            <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                <div class="h-2 rounded-full {% if item.rate < 80 %}bg-red-500{% else %}bg-green-500{% endif %}" 
+                                     style="width: {{ item.rate }}%"></div>
+                            </div>
+                            <span class="text-sm font-bold">{{ item.rate }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form method="GET" class="flex items-center gap-2">
+    <select name="month" class="rounded-xl border-gray-200 text-sm">
+        {% for m in months %}
+            <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>เดือนที่ {{ m }}</option>
+        {% endfor %}
+    </select>
+    
+    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold">
+        ดูข้อมูล
+    </button>
+
+    <a href="{% url 'lms:export_attendance_excel' classroom.id %}?month={{ selected_month }}" 
+       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center transition">
+        <span class="mr-2">📁</span> Export Excel
+    </a>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">สรุปผลการเรียนประจำเทอม 🎓</h1>
+            <p class="text-gray-500">ห้องเรียน: {{ classroom.name }} | ปีการศึกษา 2569</p>
+        </div>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition">
+            📊 Export to Excel
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 text-center">
+        <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+            <p class="text-xs font-bold text-blue-600 uppercase">เกรดเฉลี่ยห้อง</p>
+            <p class="text-2xl font-bold text-blue-800">3.24</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+            <p class="text-xs font-bold text-green-600 uppercase">สอบผ่าน (เกรด 1 ขึ้นไป)</p>
+            <p class="text-2xl font-bold text-green-800">95%</p>
+        </div>
+        </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600">เลขที่</th>
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600">ชื่อ-นามสกุล</th>
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600 text-center">คะแนนรวม (%)</th>
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600 text-center">เกรด</th>
+                    <th class="px-6 py-4 text-sm font-bold text-gray-600">สถานะ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for item in grade_report %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-gray-500 font-mono">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-gray-800">{{ item.student.user.get_full_name }}</p>
+                        <p class="text-xs text-gray-400">ID: {{ item.student.student_id }}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center font-semibold text-gray-700">
+                        {{ item.final_percentage }}%
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="text-xl font-black 
+                            {% if item.grade == '4' %} text-green-600 
+                            {% elif item.grade == '0' %} text-red-600 
+                            {% else %} text-blue-600 {% endif %}">
+                            {{ item.grade }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if item.grade == '0' %}
+                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">มส. / ตก</span>
+                        {% else %}
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">ผ่านเกณฑ์</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="flex space-x-2">
+    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition flex items-center">
+        <span class="mr-2">📊</span> Export Excel
+    </button>
+
+    <form action="{% url 'lms:send_grade_notifications' classroom.id %}" method="POST" onsubmit="return confirm('คุณต้องการส่งผลการเรียนให้ผู้ปกครองทุกคนในห้องนี้ใช่หรือไม่?')">
+        {% csrf_token %}
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition flex items-center">
+            <span class="mr-2">📲</span> ส่งผลการเรียนให้ผู้ปกครอง
+        </button>
+    </form>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Executive Dashboard | Smart School{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">แดชบอร์ดผู้บริหาร (Executive Overview)</h1>
+            <p class="text-gray-500">ข้อมูลสรุปภาพรวมโรงเรียนประจำปีการศึกษา 2026</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fa-solid fa-download mr-2"></i> ส่งออกรายงาน (PDF)
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">นักเรียนทั้งหมด</span>
+                <i class="fa-solid fa-users text-blue-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ summary.total_students }} คน</div>
+            <div class="text-xs text-green-500 mt-1"><i class="fa-solid fa-arrow-up"></i> 2.5% จากเทอมก่อน</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">การมาเรียนวันนี้</span>
+                <i class="fa-solid fa-calendar-check text-green-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ summary.avg_attendance }}%</div>
+            <div class="text-xs text-gray-400 mt-1">เป้าหมาย: 95%</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">บุคลากรครู</span>
+                <i class="fa-solid fa-chalkboard-user text-indigo-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ summary.total_teachers }} ท่าน</div>
+            <div class="text-xs text-blue-500 mt-1">ครบทุกสาขาวิชา</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm font-medium">งบค้างชำระ</span>
+                <i class="fa-solid fa-hand-holding-dollar text-red-500"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ summary.pending_fees }} ฿</div>
+            <div class="text-xs text-red-400 mt-1">รอการดำเนินการ 12 รายการ</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">คะแนนเฉลี่ยจำแนกตามระดับชั้น</h3>
+            <canvas id="performanceChart" height="200"></canvas>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">การแจ้งเตือนระบบ (Alerts)</h3>
+            <div class="space-y-4">
+                <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+                    <i class="fa-solid fa-circle-exclamation text-yellow-500 mt-1 mr-3"></i>
+                    <div>
+                        <p class="text-sm font-medium text-yellow-800">เซ็นเซอร์ IoT ห้องแล็บ 2 ขัดข้อง</p>
+                        <p class="text-xs text-yellow-600">ตรวจพบการเชื่อมต่อขาดหายเมื่อ 10 นาทีที่แล้ว</p>
+                    </div>
+                </div>
+                <div class="flex items-start p-3 bg-red-50 rounded-lg">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 mt-1 mr-3"></i>
+                    <div>
+                        <p class="text-sm font-medium text-red-800">นักเรียน ม.4/1 มีเปอร์เซ็นต์ขาดเรียนสูง</p>
+                        <p class="text-xs text-red-600">เกินเกณฑ์ที่กำหนด 5 คน (SMS Alert)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'คะแนนเฉลี่ย (%)',
+                data: {{ chart_data|safe }},
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: 100 } },
+            responsive: true,
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">วิเคราะห์ภาพรวมชั้นเรียน (MIS) 📊</h1>
+
+    <div class="mb-8 bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl shadow-sm">
+        <h3 class="text-red-700 font-bold mb-3 flex items-center">
+            <span class="mr-2">⚠️</span> นักเรียนที่ควรดูแลเป็นพิเศษ (คะแนนต่ำกว่าเกณฑ์)
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            {% for s in at_risk_students %}
+                <span class="bg-white text-red-600 px-3 py-1 rounded-full text-sm font-semibold border border-red-200">
+                    {{ s.student__first_name }} (เฉลี่ย {{ s.my_avg|round:2 }})
+                </span>
+            {% empty %}
+                <p class="text-green-600 text-sm">ยินดีด้วย! นักเรียนทุกคนผ่านเกณฑ์เบื้องต้น</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h4 class="font-bold text-gray-700 mb-4">คะแนนเฉลี่ยรายบทเรียน (%)</h4>
+            <canvas id="scoreChart"></canvas>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h4 class="font-bold text-gray-700 mb-4">สถิติการใช้ AI Tutor (จำนวนครั้งที่ถาม)</h4>
+            <canvas id="aiChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+        // กราฟคะแนน
+        const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(scoreCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for s in lesson_stats %}'{{ s.lesson__title }}',{% endfor %}],
+                datasets: [{
+                    label: 'คะแนนเฉลี่ย',
+                    data: [{% for s in lesson_stats %}{{ s.avg_score }},{% endfor %}],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // กราฟ AI
+        const aiCtx = document.getElementById('aiChart').getContext('2d');
+        new Chart(aiCtx, {
+            type: 'line',
+            data: {
+                labels: [{% for a in ai_stats %}'{{ a.lesson__title }}',{% endfor %}],
+                datasets: [{
+                    label: 'จำนวนการถาม AI',
+                    data: [{% for a in ai_stats %}{{ a.chat_count }},{% endfor %}],
+                    borderColor: 'rgb(139, 92, 246)',
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)'
+                }]
+            }
+        });
+</script>
+{% endblock %}

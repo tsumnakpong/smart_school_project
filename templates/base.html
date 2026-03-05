@@ -1,0 +1,95 @@
+{% load static %}<!DOCTYPE html>
+<html lang="th" class="transition-colors duration-500">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/ST.ico' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <title>{% block title %}Smart School Ecosystem{% endblock %}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/liquid-theme.css' %}?v=1.0">
+    
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+
+</head>
+<body class="bg-[#f8fafc] flex flex-col min-h-screen transition-colors duration-500">
+
+    <div id="global-backdrop" class="menu-backdrop"></div>
+
+    {% include 'partials/_navbar.html' %}
+
+    <main class="flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% include 'partials/_botbar.html' %}
+    <div class="lg:hidden h-20"></div>
+    
+
+
+    {% include 'partials/_footer.html' %}
+    <div class="fixed bottom-12 right-7 z-40 flex flex-col space-y-3">
+       
+        <button id="scrollToTopBtn" onclick="LiquidCore.scrollToTop()" class="hidden p-3 bg-blue-600/80 text-white rounded-full shadow-lg hover:bg-blue-700 active:scale-90 transition-all">
+            <i class="fa-solid fa-arrow-up text-md"></i>
+        </button>
+    </div>
+
+
+
+<script src="{% static 'js/liquid-core.js' %}?v=1.1"></script>
+
+<script>
+function highlightNextPrayer() {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const slots = document.querySelectorAll('.prayer-slot');
+    let nextPrayerFound = false;
+
+    slots.forEach(slot => {
+        // ล้างสีเดิมออก
+        slot.classList.remove('bg-emerald-50', 'ring-1', 'ring-emerald-200', 'shadow-inner');
+        const timeDisplay = slot.querySelector('[data-time]');
+        if (timeDisplay) timeDisplay.classList.remove('animate-pulse');
+    });
+
+    for (let slot of slots) {
+        const timeDisplay = slot.querySelector('[data-time]');
+        if (!timeDisplay) continue;
+
+        const [hours, minutes] = timeDisplay.getAttribute('data-time').split(':').map(Number);
+        const prayerMinutes = hours * 60 + minutes;
+
+        if (prayerMinutes > currentTime) {
+            // ไฮไลต์ช่องถัดไป
+            slot.classList.add('bg-emerald-50', 'ring-1', 'ring-emerald-200', 'shadow-inner');
+            timeDisplay.classList.add('animate-pulse');
+            nextPrayerFound = true;
+            break; 
+        }
+    }
+
+    // ถ้าเลยอิชาอ์ ให้ไฮไลต์ซุบฮิ (เตรียมตัววันพรุ่งนี้)
+    if (!nextPrayerFound) {
+        const fajrSlot = document.getElementById('p-fajr');
+        if (fajrSlot) {
+            fajrSlot.classList.add('bg-emerald-50', 'ring-1', 'ring-emerald-200');
+            fajrSlot.querySelector('[data-time]').classList.add('animate-pulse');
+        }
+    }
+}
+
+// สั่งรันระบบ
+document.addEventListener('DOMContentLoaded', () => {
+    highlightNextPrayer();
+    setInterval(highlightNextPrayer, 60000); // อัปเดตทุก 1 นาที
+});
+</script>
+</body>
+</html>

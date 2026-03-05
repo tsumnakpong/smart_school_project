@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load custom_filters %} {% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        <div class="p-6 bg-blue-600 text-white">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-bold">เช็คชื่อเข้าเรียน 📝</h2>
+                    <p class="opacity-90">{{ schedule.subject.name_th }} | ชั้น {{ schedule.classroom.name }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-lg">
+                        {{ today|date:"d F Y" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" class="p-6">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {% for profile in students %}
+                {% with user_id=profile.user.id %}
+                {% with is_on_leave=leave_dict|dict_get:user_id %}
+                {% with current_status=attendance_dict|dict_get:user_id %}
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between p-4 {% if is_on_leave %}bg-purple-50 border-purple-100{% else %}bg-gray-50 border-gray-100{% endif %} rounded-xl border transition-all">
+                    <div class="flex items-center mb-3 md:mb-0">
+                        <div class="h-10 w-10 rounded-full {% if is_on_leave %}bg-purple-200 text-purple-700{% else %}bg-blue-100 text-blue-600{% endif %} flex items-center justify-center font-bold mr-3 shadow-sm">
+                            {{ forloop.counter }}
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800">{{ profile.user.get_full_name }}</p>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-gray-500">ID: {{ profile.student_id }}</span>
+                                {% if is_on_leave %}
+                                <span class="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
+                                    📍 แจ้งลาออนไลน์
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex bg-white p-1 rounded-lg shadow-sm border border-gray-200">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="status_{{ user_id }}" value="present" 
+                                {% if current_status == 'present' or not current_status and not is_on_leave %}checked{% endif %} class="hidden peer">
+                            <div class="px-4 py-2 rounded-md text-xs font-bold text-gray-400 peer-checked:bg-green-500 peer-checked:text-white transition-all text-center">มา</div>
+                        </label>
+                        
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="status_{{ user_id }}" value="late" 
+                                {% if current_status == 'late' %}checked{% endif %} class="hidden peer">
+                            <div class="px-4 py-2 rounded-md text-xs font-bold text-gray-400 peer-checked:bg-yellow-500 peer-checked:text-white transition-all text-center">สาย</div>
+                        </label>
+
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="status_{{ user_id }}" value="absent" 
+                                {% if current_status == 'absent' %}checked{% endif %} class="hidden peer">
+                            <div class="px-4 py-2 rounded-md text-xs font-bold text-gray-400 peer-checked:bg-red-500 peer-checked:text-white transition-all text-center">ขาด</div>
+                        </label>
+
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="status_{{ user_id }}" value="leave" 
+                                {% if current_status == 'leave' or is_on_leave %}checked{% endif %} class="hidden peer">
+                            <div class="px-4 py-2 rounded-md text-xs font-bold text-gray-400 peer-checked:bg-purple-600 peer-checked:text-white transition-all text-center">ลา</div>
+                        </label>
+                    </div>
+                </div>
+                
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+                {% endfor %}
+            </div>
+
+            <div class="sticky bottom-4 mt-8">
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-2xl transition transform hover:-translate-y-1 active:scale-95">
+                    ✅ บันทึกการเช็คชื่อเข้าเรียน
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

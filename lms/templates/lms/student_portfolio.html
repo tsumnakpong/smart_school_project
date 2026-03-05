@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+<div class="max-w-sm mx-auto mt-10">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-center text-white">
+            <h2 class="text-xl font-bold uppercase tracking-wider">Student Digital ID</h2>
+            <p class="text-blue-100 text-sm italic">โรงเรียนสมาร์ทวิทยานุสรณ์</p>
+        </div>
+
+        <div class="p-8 text-center bg-gray-50">
+            <div class="bg-white p-4 rounded-2xl shadow-inner inline-block">
+                <img src="{{ qr_code }}" alt="Student QR Code" class="w-48 h-48 mx-auto">
+            </div>
+            <p class="mt-4 text-gray-400 text-xs font-mono uppercase tracking-widest">Scan for Attendance</p>
+        </div>
+
+        <div class="p-6 border-t border-dashed border-gray-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-400 uppercase font-bold">ชื่อ-นามสกุล</p>
+                    <p class="text-lg font-bold text-gray-800">{{ request.user.get_full_name }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-400 uppercase font-bold">รหัสประจำตัว</p>
+                    <p class="text-lg font-mono font-bold text-indigo-600">{{ student.student_id }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 p-3 text-center">
+            <p class="text-[10px] text-gray-400 uppercase">Valid for Academic Year 2026</p>
+        </div>
+    </div>
+</div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
+        <div class="h-32 w-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+            {{ student.user.first_name|slice:":1" }}{{ student.user.last_name|slice:":1" }}
+        </div>
+        <div class="flex-1 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-gray-800">{{ student.user.get_full_name }}</h1>
+            <p class="text-gray-500 text-lg">รหัสนักเรียน: {{ student.student_id }} | ชั้นมัธยมศึกษาปีที่ {{ student.classroom.name }}</p>
+            <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                <span class="px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">GPA จำลอง: {{ avg_score }}</span>
+                <span class="px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">มาเรียน: {{ total_days }} ครั้ง</span>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+             <a href="{% url 'lms:export_pdf' student.id %}" class="bg-gray-800 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-black transition text-center">
+                📄 ดาวน์โหลดรายงาน PDF
+             </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="mr-2">📉</span> พัฒนาการคะแนนสอบ
+                </h3>
+                <div class="h-64">
+                    <canvas id="studentScoreChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <h3 class="font-bold text-gray-800 p-6 border-b">บันทึกคะแนนรายบทเรียน</h3>
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-gray-600 uppercase">
+                        <tr>
+                            <th class="px-6 py-3">บทเรียน</th>
+                            <th class="px-6 py-3 text-center">คะแนน</th>
+                            <th class="px-6 py-3">วันที่สอบ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        {% for score in quiz_scores %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium">{{ score.lesson.title }}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="font-bold {% if score.score >= 5 %}text-green-600{% else %}text-red-500{% endif %}">{{ score.score }}</span>/{{ score.total_questions }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-500">{{ score.timestamp|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <h3 class="font-bold text-gray-800 mb-4 text-left">สัดส่วนการมาเรียน</h3>
+                <canvas id="attendanceDoughnut"></canvas>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="font-bold text-gray-800 mb-4">บันทึกการลา</h3>
+                <div class="space-y-3">
+                    {% for leave in leave_history %}
+                    <div class="p-3 bg-purple-50 rounded-xl border border-purple-100">
+                        <p class="text-sm font-bold text-purple-800">{{ leave.get_leave_type_display }}</p>
+                        <p class="text-xs text-purple-600">{{ leave.start_date }} ถึง {{ leave.end_date }}</p>
+                        <p class="text-[10px] text-gray-500 mt-1 italic">เหตุผล: {{ leave.reason }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-gray-400 text-sm py-4 italic">ไม่มีประวัติการลา</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'lms:export_student_grade_pdf' student.id %}" 
+   class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl font-bold transition flex items-center">
+    <span class="mr-2">📕</span> ออกใบ ปพ. (PDF)
+</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // กราฟพัฒนาการคะแนน (Line Chart)
+    const scoreCtx = document.getElementById('studentScoreChart').getContext('2d');
+    new Chart(scoreCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for s in quiz_scores|slice:":10" reversed %}'{{ s.lesson.title|truncatechars:10 }}',{% endfor %}],
+            datasets: [{
+                label: 'คะแนนสอบ',
+                data: [{% for s in quiz_scores|slice:":10" reversed %}{{ s.score }},{% endfor %}],
+                borderColor: '#2563eb',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(37, 99, 235, 0.1)'
+            }]
+        }
+    });
+
+    // กราฟสัดส่วนการมาเรียน (Doughnut Chart)
+    const attCtx = document.getElementById('attendanceDoughnut').getContext('2d');
+    new Chart(attCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['มาเรียน', 'สาย', 'ขาด', 'ลา'],
+            datasets: [{
+                data: [
+                    {% for s in attendance_stats %}{% if s.status == 'present' %}{{ s.count }}{% endif %}{% endfor %}0,
+                    {% for s in attendance_stats %}{% if s.status == 'late' %}{{ s.count }}{% endif %}{% endfor %}0,
+                    {% for s in attendance_stats %}{% if s.status == 'absent' %}{{ s.count }}{% endif %}{% endfor %}0,
+                    {% for s in attendance_stats %}{% if s.status == 'leave' %}{{ s.count }}{% endif %}{% endfor %}0
+                ],
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+            }]
+        }
+    });
+</script>
+{% endblock %}

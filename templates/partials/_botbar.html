@@ -1,0 +1,107 @@
+<div id="main-botbar" class="lg:hidden fixed bottom-8 left-6 right-6 z-50">
+    <div class="relative bg-white/40 backdrop-blur-2xl rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.6)] border border-white/30 px-6 py-3 transition-all duration-700">
+        
+        <div class="absolute inset-0 rounded-[3rem] border-t-2 border-l-2 border-white/40 pointer-events-none"></div>
+
+        <div class="flex justify-between items-center relative z-10">
+            <a href="/" class="flex flex-col items-center group">
+                <div class="p-1 rounded-2xl group-active:bg-blue-100/40 transition-all duration-300">
+                    <i class="fa-solid fa-house text-xl text-blue-500"></i>
+                </div>
+                <span class="text-[12px] mt-0.5 font-black text-blue-600 tracking-tighter">หน้าแรก</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center group">
+                <div class="p-1 rounded-2xl group-active:bg-slate-100/40 transition-all duration-300">
+                    <i class="fa-solid fa-calendar-days text-xl text-slate-300"></i>
+                </div>
+                <span class="text-[12px] mt-0.5 font-black text-slate-400 tracking-tighter">ตารางเรียน</span>
+            </a>
+
+            <div class="relative -mt-14">
+                <div class="absolute inset-0 bg-blue-400/20 blur-xl rounded-full scale-150"></div>
+                <button onclick="LiquidCore.toggleSlideUpMenu()" 
+                        class="relative w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-600 text-white rounded-[2rem] shadow-[0_15px_35px_rgba(37,99,235,0.3)] flex items-center justify-center active:scale-90 transition-all duration-500 ring-[6px] ring-white/90">
+                    <i class="fa-solid fa-plus text-2xl transition-transform duration-500" id="action-icon"></i>
+                </button>
+            </div>
+
+            <a href="#" class="flex flex-col items-center group">
+                <div class="p-1 rounded-2xl relative group-active:bg-rose-50/40 transition-all duration-300">
+                    <i class="fa-solid fa-bell text-xl text-slate-300"></i>
+                    <span class="absolute top-1 right-1 bg-rose-400 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-white">3</span>
+                </div>
+                <span class="text-[12px] mt-0.5 font-black text-slate-400 tracking-tighter">แจ้งเตือน</span>
+            </a>
+
+            <a href="{% url 'profile' %}" class="flex flex-col items-center group">
+                <div class="p-1 rounded-2xl group-active:bg-slate-50/40 transition-all duration-300">
+                    <i class="fa-solid fa-circle-user text-xl text-slate-300"></i>
+                </div>
+                <span class="text-[12px] mt-0.5 font-black text-slate-400 tracking-tighter">โปรไฟล์</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="slide-up-menu" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-3xl z-[1001] rounded-t-[3.5rem] p-8 transform translate-y-full transition-transform duration-700 cubic-bezier(0.23, 1, 0.32, 1) border-t border-white/50 shadow-[0_-20px_60px_rgba(0,0,0,0.05)]">
+    <div class="w-10 h-1.5 bg-slate-200 rounded-full mx-auto mb-10" onclick="toggleSlideMenu()"></div>
+    
+    <h3 class="text-center font-black text-slate-800 mb-10 text-xl tracking-tight">ทางลัดด่วน</h3>
+
+    <div class="grid grid-cols-3 gap-6 mb-12">
+        {% if user.role == 'teacher' %}
+            <a href="#" class="flex flex-col items-center group">
+                <div class="w-16 h-16 bg-[#F1F3FF] rounded-[2rem] flex items-center justify-center mb-2 shadow-sm border border-indigo-50 group-active:scale-95 transition-all">
+                    <i class="fa-solid fa-clipboard-check text-2xl text-[#6366F1]/70"></i>
+                </div>
+                <span class="text-[11px] font-black text-slate-500">เช็คชื่อ</span>
+            </a>
+        {% elif user.role == 'student' %}
+            <a href="#" class="flex flex-col items-center group">
+                <div class="w-16 h-16 bg-[#F0F7FF] rounded-[2rem] flex items-center justify-center mb-2 shadow-sm border border-blue-50 group-active:scale-95 transition-all">
+                    <i class="fa-solid fa-book-open text-2xl text-[#3B82F6]/70"></i>
+                </div>
+                <span class="text-[11px] font-black text-slate-500">การบ้าน</span>
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="pt-8 border-t border-slate-100">
+        <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Islamic Suite</p>
+        
+        <div class="grid grid-cols-4 gap-4 px-2">
+            <a href="{% url 'islamic:prayer_calendar' %}" class="flex flex-col items-center group">
+                <div class="w-14 h-14 bg-[#F1F9F5] rounded-[1.25rem] flex items-center justify-center mb-2 transition-all group-active:scale-90 shadow-sm border border-[#E1F2E9] group-hover:bg-[#E1F2E9]">
+                    <i class="fa-solid fa-clock text-[#4CAF50]/60 text-lg"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-500 tracking-tight">ปฏิทินละหมาด</span>
+            </a>
+
+            <a href="{% url 'islamic:quran' %}" class="flex flex-col items-center group">
+                <div class="w-14 h-14 bg-[#FFF9F0] rounded-[1.25rem] flex items-center justify-center mb-2 transition-all group-active:scale-90 shadow-sm border border-[#FFF0D9] group-hover:bg-[#FFF0D9]">
+                    <i class="fa-solid fa-book-quran text-[#FFA000]/60 text-lg"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-500 tracking-tight">กุรอาน</span>
+            </a>
+
+            <a href="{% url 'islamic:qibla' %}" class="flex flex-col items-center group">
+                <div class="w-14 h-14 bg-[#F0F7FF] rounded-[1.25rem] flex items-center justify-center mb-2 transition-all group-active:scale-90 shadow-sm border border-[#E0EFFF] group-hover:bg-[#E0EFFF]">
+                    <i class="fa-solid fa-compass text-[#2196F3]/60 text-lg"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-500 tracking-tight">กิบลัต</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center group">
+                <div class="w-14 h-14 bg-[#FFF5F6] rounded-[1.25rem] flex items-center justify-center mb-2 transition-all group-active:scale-90 shadow-sm border border-[#FFE6E9] group-hover:bg-[#FFE6E9]">
+                    <i class="fa-solid fa-hands-praying text-[#E91E63]/60 text-lg"></i>
+                </div>
+                <span class="text-[10px] font-black text-slate-500 tracking-tight">ดุอาอ์</span>
+            </a>
+        </div>
+    </div>
+
+    <button onclick="LiquidCore.closeAllMenus()" class="w-full mt-12 py-5 bg-slate-50 text-slate-400 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all border border-slate-100/50">
+        ปิดเมนูทางลัด
+    </button>
+</div>
