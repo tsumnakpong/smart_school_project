@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-md mx-auto py-6 px-4 text-center animate-fade-in">
+    <div class="inline-flex items-center px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[11px] font-black uppercase tracking-[0.2em] mb-6 border border-emerald-100 shadow-sm">
+        <i class="fa-solid fa-compass-outline mr-2"></i> Qibla Finder
+    </div>
+
+    <h2 class="text-3xl font-black text-slate-800 mb-2">ค้นหาทิศกิบลัต</h2>
+    <p class="text-slate-400 text-sm mb-12 font-medium">วางมือถือในแนวราบและหันหน้าไปยังกะอ์บะฮ์</p>
+
+    <div class="relative w-80 h-80 mx-auto mb-12">
+        <div id="qibla-glow" class="absolute inset-0 bg-emerald-400/0 rounded-full blur-3xl transition-all duration-500 scale-110"></div>
+        
+        <div class="absolute inset-0 border-[12px] border-white dark:border-slate-800 rounded-full shadow-2xl z-10"></div>
+        
+<div id="compass-disc" class="absolute inset-0 transition-transform duration-300 ease-out z-20 shadow-inner rounded-full bg-white/40 backdrop-blur-md border border-white/50">
+    
+    <div class="absolute top-4 left-1/2 -translate-x-1/2 font-black text-rose-500 text-xl">N</div>
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 font-black text-slate-300 text-xl">S</div>
+    <div class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">W</div>
+    <div class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-slate-300 text-xl">E</div>
+
+    <div id="qibla-pivot" class="absolute inset-0 transition-all duration-500 opacity-0">
+        <div class="absolute top-[-20px] left-1/2 -translate-x-1/2 flex flex-col items-center">
+            <div class="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-1 border border-emerald-100">
+                <i class="fa-solid fa-kaaba text-2xl text-emerald-600"></i>
+            </div>
+            <div class="w-1.5 h-36 bg-gradient-to-b from-emerald-500/80 to-transparent rounded-full"></div>
+        </div>
+    </div>
+    
+    <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-4 h-4 bg-slate-200 rounded-full border-4 border-white shadow-sm z-30"></div>
+    </div>
+</div>
+    </div>
+
+    <div class="bg-white/70 backdrop-blur-xl p-8 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-white relative z-30">
+        <div class="grid grid-cols-2 gap-8 relative">
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-10 bg-slate-100"></div>
+            
+            <div class="text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">เข็มทิศ</p>
+                <p id="current-deg" class="text-3xl font-black text-slate-800">0°</p>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ทิศกิบลัต</p>
+                <p id="qibla-deg" class="text-3xl font-black text-emerald-600">--°</p>
+            </div>
+        </div>
+        
+        <div id="status-msg" class="mt-8 py-3 px-6 bg-slate-50 rounded-2xl text-xs font-black text-amber-500 transition-all duration-500">
+            <i class="fa-solid fa-location-dot mr-2"></i> รอยืนยันพิกัด GPS...
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #F8FAFC; }
+    .animate-fade-in { animation: fadeIn 0.8s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Animation เมื่อเจอทิศที่ถูกต้อง */
+    .locked {
+        animation: pulseEmerald 2s infinite;
+    }
+    @keyframes pulseEmerald {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+</style>
+
+<script>
+    let qiblaAngle = 0;
+    const compassDisc = document.getElementById('compass-disc');
+    const kaabaMarker = document.getElementById('kaaba-marker');
+    const qiblaGlow = document.getElementById('qibla-glow');
+    const statusMsg = document.getElementById('status-msg');
+
+    function calculateQibla(lat, lng) {
+        const kaabaLat = 21.4225;
+        const kaabaLng = 39.8262;
+        const phi = lat * Math.PI / 180.0;
+        const lambda = lng * Math.PI / 180.0;
+        const phiK = kaabaLat * Math.PI / 180.0;
+        const lambdaK = kaabaLng * Math.PI / 180.0;
+
+        const y = Math.sin(lambdaK - lambda);
+        const x = Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda);
+        let angle = Math.atan2(y, x) * 180.0 / Math.PI;
+        return (angle + 360) % 360;
+    }
+
+// เปลี่ยนบรรทัดใน navigator.geolocation.getCurrentPosition
+navigator.geolocation.getCurrentPosition(pos => {
+    qiblaAngle = calculateQibla(pos.coords.latitude, pos.coords.longitude);
+    document.getElementById('qibla-deg').innerText = Math.round(qiblaAngle) + '°';
+    
+    const qiblaPivot = document.getElementById('qibla-pivot');
+    qiblaPivot.style.opacity = '1';
+    // หมุนเลเยอร์ Pivot ทั้งอันไปตามองศากิบลัต
+    qiblaPivot.style.transform = `rotate(${qiblaAngle}deg)`;
+    
+    statusMsg.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> คำนวณทิศสำเร็จ! กรุณาหมุนตัว';
+    statusMsg.className = "mt-8 py-3 px-6 bg-emerald-50 rounded-2xl text-xs font-black text-emerald-600 transition-all";
+}, err => {
+    statusMsg.innerText = "กรุณาเปิด GPS เพื่อความแม่นยำ";
+});
+
+    function handleOrientation(e) {
+        let heading = e.webkitCompassHeading || (360 - e.alpha);
+        if (!heading) return;
+
+        // หมุนแผ่นเข็มทิศ
+        compassDisc.style.transform = `rotate(${-heading}deg)`;
+        document.getElementById('current-deg').innerText = Math.round(heading) + '°';
+
+        // คำนวณความต่างของทิศปัจจุบันกับทิศกิบลัต
+        const diff = Math.abs(heading - qiblaAngle);
+        
+        // ถ้าตรงทิศ (บวกไม่เกิน 5 องศา)
+        if (diff < 5 || diff > 355) {
+            qiblaGlow.style.backgroundColor = 'rgba(52, 211, 153, 0.3)';
+            statusMsg.innerText = "ตรงทิศกิบลัตแล้ว (Allahu Akbar!)";
+            statusMsg.classList.add('locked');
+            if (navigator.vibrate) navigator.vibrate(50); // สั่นเล็กน้อย
+        } else {
+            qiblaGlow.style.backgroundColor = 'transparent';
+            statusMsg.classList.remove('locked');
+        }
+    }
+
+    // Permission Logic
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        document.body.addEventListener('click', () => {
+            DeviceOrientationEvent.requestPermission().then(state => {
+                if (state === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                }
+            });
+        }, { once: true });
+    } else {
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+    }
+</script>
+{% endblock %}

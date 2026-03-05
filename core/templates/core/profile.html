@@ -1,0 +1,193 @@
+
+{% extends 'base.html' %}
+
+
+
+{% block title %}โปรไฟล์ของฉัน | Smart School{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10 px-4">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+        <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+        
+        <div class="px-8 pb-10">
+            <div class="relative flex justify-center lg:justify-start">
+                <div class="-mt-16 relative">
+                    <div class="h-32 w-32 rounded-3xl bg-white p-1 shadow-lg">
+                        <div class="h-full w-full rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-100">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" id="avatar-preview" class="h-full w-full object-cover">
+                            {% else %}
+                                <i class="fa-solid fa-user-astronaut text-4xl text-blue-300" id="avatar-icon"></i>
+                                <img src="" id="avatar-preview" class="h-full w-full object-cover hidden">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <label for="avatar-input" class="absolute -bottom-2 -right-2 bg-white h-10 w-10 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-gray-50 transition text-blue-600 border border-gray-100">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <h2 class="text-3xl font-black text-gray-900">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="text-blue-600 font-bold uppercase tracking-widest text-sm">{{ user.get_role_display }}</p>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" id="avatar-form" class="mt-4 lg:mt-0">
+                    {% csrf_token %}
+                    <input type="file" name="avatar" id="avatar-input" class="hidden" accept="image/*" onchange="previewImage(this)">
+                    <button type="submit" id="save-btn" class="hidden bg-green-600 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-green-100 hover:bg-green-700 transition">
+                        บันทึกรูปใหม่
+                    </button>
+                </form>
+            </div>
+
+            <hr class="my-8 border-gray-100">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">ชื่อผู้ใช้งาน</label>
+                        <p class="text-lg font-medium text-gray-700">{{ user.username }}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">อีเมล</label>
+                        <p class="text-lg font-medium text-gray-700">{{ user.email|default:"- ไม่ระบุ -" }}</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">เบอร์โทรศัพท์</label>
+                        <p class="text-lg font-medium text-gray-700">{{ user.phone|default:"- ไม่ระบุ -" }}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">สถานะบัญชี</label>
+                        <p class="flex items-center text-green-600 font-bold">
+                            <span class="h-2 w-2 bg-green-600 rounded-full mr-2"></span> กำลังใช้งาน
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="bg-white shadow-sm border border-gray-100 p-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fa-solid fa-key mr-3 text-indigo-600"></i> เปลี่ยนรหัสผ่านใหม่
+        </h3>
+
+<div class="mt-8 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+    <h3 class="font-bold text-gray-800 mb-6 text-xl">🛡️ ความปลอดภัย</h3>
+    
+    
+<button onclick="toggleModal()" class="bg-gray-800 text-white px-6 py-2 rounded-xl font-bold transition hover:bg-black shadow-lg shadow-gray-200">
+    <i class="fa-solid fa-key mr-2"></i> เปลี่ยนรหัสผ่าน
+</button>
+</div>
+</div>
+
+    </div>
+</div>
+
+
+
+
+<div id="passwordModal" class="fixed inset-0 z-[60] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl transform transition-all">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-gray-800">เปลี่ยนรหัสผ่านใหม่</h3>
+                <button onclick="toggleModal()" class="text-gray-400 hover:text-red-500 transition text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+
+
+ <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="p_form" value="1">
+    
+    <div class="space-y-5">
+        {% if p_form %}
+            {% for field in p_form %}
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">{{ field.label }}</label>
+                
+                <div class="password-input-wrapper">
+                    {{ field }} 
+                </div>
+
+                {% if field.errors %}
+                    <p class="text-red-500 text-xs mt-1 font-bold">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-red-500 font-bold bg-red-50 p-4 rounded-xl">
+                ⚠️ ระบบขัดข้อง: ไม่พบข้อมูลฟอร์มรหัสผ่าน
+            </p>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold mt-6 shadow-lg">
+        ยืนยันการเปลี่ยนรหัสผ่าน
+    </button>
+</form>
+
+<style>
+    /* ✅ แต่งหน้าตา Input ที่ Django เจนออกมาให้สวยเหมือน Tailwind */
+    .password-input-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        background-color: #f9fafb;
+        border: 1px solid #f3f4f6;
+        border-radius: 1rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .password-input-wrapper input:focus {
+        border-color: #3b82f6;
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+</style>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal() {
+        const modal = document.getElementById('passwordModal');
+        modal.classList.toggle('hidden');
+    }
+
+    // ✅ ปิด Modal เมื่อคลิกพื้นที่ว่างข้างนอก
+    window.onclick = function(event) {
+        const modal = document.getElementById('passwordModal');
+        if (event.target == modal) {
+            toggleModal();
+        }
+    }
+
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatar-preview');
+            const icon = document.getElementById('avatar-icon');
+            
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            if(icon) icon.classList.add('hidden');
+            
+            document.getElementById('save-btn').classList.remove('hidden');
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

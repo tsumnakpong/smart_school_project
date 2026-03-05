@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}ติดต่อเรา | Smart School{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    
+    <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">ติดต่อเรา</h1>
+        <div class="h-1.5 w-24 bg-blue-600 mx-auto rounded-full"></div>
+        <p class="mt-6 text-xl text-gray-500 max-w-2xl mx-auto font-medium">
+            หากคุณมีข้อสงสัยหรือต้องการสอบถามข้อมูลเพิ่มเติม สามารถติดต่อเราได้ตามช่องทางด้านล่างนี้
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-20">
+        
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-50 group hover:bg-blue-600 transition duration-300">
+                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/20 group-hover:text-white transition">
+                    <i class="fa-solid fa-location-dot text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-white">ที่ตั้งโรงเรียน</h3>
+                <p class="text-gray-500 group-hover:text-blue-100 font-medium">
+                    เลขที่ 180 ม.10 ต.ท่าเรือ อ.เมือง <br>จ.นครศรีธรรมราช 80000
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-50 group hover:bg-emerald-600 transition duration-300">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-white/20 group-hover:text-white transition">
+                    <i class="fa-solid fa-phone text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-white">โทรศัพท์ & อีเมล</h3>
+                <p class="text-gray-500 group-hover:text-emerald-100 font-medium">
+                    โทร: 075-XXXXXX <br>
+                    อีเมล: admin@santitham.ac.th
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-50">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">ช่องทางออนไลน์</h3>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center hover:bg-green-600 hover:text-white transition">
+                        <i class="fa-brands fa-line"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center hover:bg-red-600 hover:text-white transition">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white p-8 md:p-12 rounded-[3rem] border border-gray-100 shadow-2xl">
+            <h3 class="text-2xl font-black text-gray-800 mb-8">ส่งข้อความถึงเรา</h3>
+            <form action="#" method="POST" class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">ชื่อ-นามสกุล</label>
+                        <input type="text" placeholder="กรอกชื่อของคุณ" class="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-blue-600 outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">เบอร์โทรศัพท์</label>
+                        <input type="tel" placeholder="08X-XXXXXXX" class="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-blue-600 outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">หัวข้อติดต่อ</label>
+                    <select class="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-blue-600 outline-none transition">
+                        <option>สอบถามข้อมูลการสมัครเรียน</option>
+                        <option>แจ้งปัญหาการใช้งานระบบ</option>
+                        <option>ติดต่อฝ่ายธุรการ</option>
+                        <option>อื่นๆ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">ข้อความ</label>
+                    <textarea rows="4" placeholder="พิมพ์ข้อความของคุณที่นี่..." class="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-blue-600 outline-none transition"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl shadow-blue-100 hover:bg-blue-700 transition active:scale-95">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> ส่งข้อความ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-[3rem] border border-gray-100 shadow-xl overflow-hidden">
+        <div class="h-[450px] w-full rounded-[2.5rem] overflow-hidden">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3945.7197463690616!2d100.015!3d8.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwMzEnMTIuMCJOIDEwMMKwMDAnNTQuMCJF!5e0!3m2!1sth!2sth!4v1644910000000!5m2!1sth!2sth" 
+                class="w-full h-full border-0" 
+                allowfullscreen="" 
+                loading="lazy">
+            </iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}

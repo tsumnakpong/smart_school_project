@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}เกี่ยวกับเรา | Smart School{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4">
+    
+    <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">เกี่ยวกับเรา</h1>
+        <div class="h-1.5 w-24 bg-blue-600 mx-auto rounded-full"></div>
+        <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
+            มุ่งเน้นการจัดการศึกษาที่มีคุณภาพ ควบคู่ไปกับจริยธรรมอิสลาม เพื่อสร้างสรรค์สังคมแห่งการเรียนรู้ที่ยั่งยืน
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-10 rounded-[2.5rem] text-white shadow-xl shadow-blue-100">
+            <i class="fa-solid fa-eye text-4xl mb-6 opacity-80"></i>
+            <h3 class="text-2xl font-bold mb-4">วิสัยทัศน์ (Vision)</h3>
+            <p class="text-lg leading-relaxed opacity-90">
+                เป็นสถานศึกษานำร่องในการบูรณาการความรู้ทางวิชาการและเทคโนโลยี เข้ากับหลักการศาสนา เพื่อผลิตบุคลากรที่มีคุณภาพและคุณธรรม
+            </p>
+        </div>
+        <div class="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100">
+            <i class="fa-solid fa-bullseye text-4xl text-blue-600 mb-6"></i>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">พันธกิจ (Mission)</h3>
+            <ul class="space-y-3 text-gray-600">
+                <li class="flex items-start"><i class="fa-solid fa-check-circle text-blue-500 mt-1.5 mr-3"></i> พัฒนาหลักสูตรการเรียนรู้ที่ทันสมัย</li>
+                <li class="flex items-start"><i class="fa-solid fa-check-circle text-blue-500 mt-1.5 mr-3"></i> ส่งเสริมทักษะเทคโนโลยีและนวัตกรรม (IoT, AI)</li>
+                <li class="flex items-start"><i class="fa-solid fa-check-circle text-blue-500 mt-1.5 mr-3"></i> ปลูกฝังอัตลักษณ์อิสลามและการอยู่ร่วมกันในสังคม</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-[3rem] p-10 md:p-16 mb-20">
+        <h2 class="text-3xl font-black text-center text-gray-800 mb-12">เอกลักษณ์ของเรา</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-600">
+                    <i class="fa-solid fa-atom text-2xl"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">เทคโนโลยีเข้มข้น</h4>
+                <p class="text-sm text-gray-500 font-medium">จัดการเรียนรู้ด้านหุ่นยนต์ และนวัตกรรมดิจิทัล</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                    <i class="fa-solid fa-mosque text-2xl"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">จริยธรรมนำหน้า</h4>
+                <p class="text-sm text-gray-500 font-medium">บ่มเพาะมรรยาทตามแบบอย่างศาสนา</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-amber-600">
+                    <i class="fa-solid fa-users text-2xl"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">สังคมแห่งการแบ่งปัน</h4>
+                <p class="text-sm text-gray-500 font-medium">ส่งเสริมการช่วยเหลือเพื่อนมนุษย์</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-rose-600">
+                    <i class="fa-solid fa-earth-asia text-2xl"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">ทักษะสากล</h4>
+                <p class="text-sm text-gray-500 font-medium">เน้นภาษาและการสื่อสารระดับนานาชาติ</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative overflow-hidden bg-white border border-gray-100 rounded-[2.5rem] p-10 md:p-16 shadow-2xl">
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-8 md:mb-0">
+                <h2 class="text-3xl font-black text-gray-900 mb-4">แวะมาเยี่ยมชมโรงเรียนเรา</h2>
+                <p class="text-gray-500 font-bold">มูลนิธิมุสลิมสันติธรรม นครศรีธรรมราช</p>
+            </div>
+            <a href="https://maps.google.com" target="_blank" class="bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold shadow-xl hover:bg-black transition active:scale-95">
+                <i class="fa-solid fa-map-location-dot mr-3"></i> ดูที่ตั้งบนแผนที่
+            </a>
+        </div>
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-50 rounded-full opacity-50"></div>
+    </div>
+</div>
+{% endblock %}

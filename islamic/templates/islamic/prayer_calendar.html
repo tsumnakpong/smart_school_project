@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="max-w-6xl mx-auto py-10 px-4 space-y-8 animate-fade-in">
+
+    <div class="flex flex-col lg:flex-row justify-between items-center gap-8 bg-white dark:bg-darkSurface p-8 rounded-[2.5rem] shadow-xl border-b-4 border-islam-gold relative overflow-hidden">
+        <div class="flex items-center gap-6 z-10">
+            <div class="w-20 h-20 bg-islam-green rounded-[2rem] flex items-center justify-center text-white text-4xl shadow-lg rotate-3 shrink-0">
+                <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 dark:text-white leading-tight">ตารางเวลาละหมาด</h1>
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                    <p class="text-islam-gold font-bold text-lg">เดือน {{ current_hijri_month_name }} ฮ.ศ. {{ current_hijri_year }}</p>
+                    <span class="hidden md:inline text-slate-300">|</span>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">{{ current_date|date:"F Y" }}</p>
+                </div>
+                
+                <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mt-3 bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-full w-fit border border-slate-100 dark:border-white/10">
+                    <i class="fa-solid fa-location-dot text-islam-green animate-pulse"></i>
+                    <span>คำนวณสำหรับ: <strong class="text-slate-700 dark:text-slate-300">{{ location_name|default:"พิกัดกลาง (กทม.)" }}</strong><p class="text-[10px] text-slate-400 uppercase tracking-tighter">
+                Lat: {{ lat|floatformat:4 }} | Lng: {{ lng|floatformat:4 }}</p></span>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto z-10">
+            <button id="get-loc-btn" onclick="LiquidCore.getLocation()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-2xl font-bold transition-all shadow-lg flex items-center justify-center border-b-4 border-blue-800/50">
+                <i class="fa-solid fa-location-crosshairs mr-2"></i> อัปเดตพิกัด
+            </button>
+            <a href="{% url 'islamic:download_pdf' %}?lat={{ lat }}&lng={{ lng }}" 
+               class="bg-slate-900 hover:bg-islam-green text-white px-8 py-4 rounded-2xl font-black transition-all transform hover:scale-105 shadow-xl flex items-center justify-center group border-b-4 border-black/20">
+                <i class="fa-solid fa-file-pdf mr-3 text-2xl group-hover:animate-bounce"></i>
+                <div class="text-left">
+                    <span class="block leading-none text-sm">ดาวน์โหลด PDF</span>
+                    <span class="text-[10px] font-medium opacity-60 uppercase tracking-tighter">A4 PRINTABLE</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="absolute -right-10 -bottom-10 text-9xl text-slate-50 dark:text-white/5 -rotate-12 pointer-events-none">
+            <i class="fa-solid fa-kaaba"></i>
+        </div>
+    </div>
+
+    <div class="liquid-card p-0 overflow-hidden shadow-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-darkSurface rounded-3xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400">
+                        <th class="p-4 text-center font-black">ฮิจเราะฮ์</th>
+                        <th class="p-4 text-center font-black">วันที่</th>
+                        <th class="p-4 text-center font-black text-islam-green">อิมซาก</th>
+                        <th class="p-4 text-center font-black">ซุบฮิ</th>
+                        <th class="p-4 text-center font-black">ชูรูก</th>
+                        <th class="p-4 text-center font-black">ซุฮรี</th>
+                        <th class="p-4 text-center font-black">อัศรี</th>
+                        <th class="p-4 text-center font-black text-orange-600">มักริบ</th>
+                        <th class="p-4 text-center font-black border-r-0">อิชาอ์</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+    {% for day in prayer_calendar_data %}
+    <tr class="hover:bg-islam-green/5 transition-all duration-300 
+        {% if day.is_today %} 
+            bg-islam-green/10 
+            border-l-8 border-islam-green 
+            shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]
+            relative z-10
+        {% endif %} 
+        {% if day.is_friday %}bg-slate-50/50 dark:bg-white/5{% endif %}">
+        
+        <td class="p-4 text-center font-black {% if day.is_today %}text-islam-green text-xl{% else %}text-islam-gold{% endif %}">
+            {{ day.hijri_day }}
+        </td>
+        <td class="p-4 text-center">
+            <span class="font-bold {% if day.is_today %}text-islam-green{% else %}text-slate-700 dark:text-slate-300{% endif %} block whitespace-nowrap">
+                {{ day.gregorian_day }}
+            </span>
+            <span class="text-[10px] block text-slate-400 font-bold">{{ day.day_name }}</span>
+        </td>
+        <td class="p-4 text-center font-bold text-emerald-700 bg-emerald-50/30">{{ day.imsak }}</td>
+        <td class="p-4 text-center font-black {% if day.is_today %}text-islam-green scale-110{% else %}text-slate-800 dark:text-blue-400{% endif %}">{{ day.fajr }}</td>
+        <td class="p-4 text-center text-slate-400 text-sm">{{ day.sunrise }}</td>
+        <td class="p-4 text-center font-black {% if day.is_today %}text-islam-green scale-110{% else %}text-slate-800 dark:text-blue-400{% endif %}">{{ day.dhuhr }}</td>
+        <td class="p-4 text-center font-black {% if day.is_today %}text-islam-green scale-110{% else %}text-slate-800 dark:text-blue-400{% endif %}">{{ day.asr }}</td>
+        <td class="p-4 text-center font-black text-orange-600 bg-orange-50/50 {% if day.is_today %}scale-110{% endif %}">{{ day.maghrib }}</td>
+        <td class="p-4 text-center font-black {% if day.is_today %}text-islam-green scale-110{% else %}text-slate-800 dark:text-blue-400{% endif %}">{{ day.isha }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="liquid-card p-6 bg-islam-green/5 border-none rounded-3xl">
+            <h4 class="font-black text-islam-green mb-2 flex items-center">
+                <i class="fa-solid fa-circle-info mr-2"></i> คำแนะนำ
+            </h4>
+            <p class="text-sm text-slate-500 leading-relaxed">ควรเผื่อเวลาอย่างน้อย 2-3 นาที เพื่อความปลอดภัยในการปฏิบัติศาสนกิจ</p>
+        </div>
+        
+        <div class="liquid-card p-6 bg-orange-500/5 border-none rounded-3xl">
+            <h4 class="font-black text-orange-600 mb-2 flex items-center">
+                <i class="fa-solid fa-moon mr-2"></i> ละศีลอด (Iftar)
+            </h4>
+            <p class="text-sm text-slate-500 leading-relaxed">เวลาละศีลอดให้ยึดตามเวลาเข้า **มักริบ** เป็นสำคัญ</p>
+        </div>
+
+        <div class="liquid-card p-6 bg-islam-gold/5 border-none rounded-3xl">
+            <h4 class="font-black text-islam-gold mb-2 flex items-center">
+                <i class="fa-solid fa-map-location-dot mr-2"></i> ข้อมูลพิกัด
+            </h4>
+            <p class="text-sm text-slate-700 dark:text-slate-300 font-bold mb-1">{{ location_name|default:"พิกัดกลาง" }}</p>
+            <p class="text-[10px] text-slate-400 uppercase tracking-tighter">
+                Lat: {{ lat|floatformat:4 }} | Lng: {{ lng|floatformat:4 }}
+            </p>
+        </div>
+    </div>
+</main>
+
+<style>
+    .text-islam-gold { color: #C5A059; }
+    .bg-islam-green { background-color: #10B981; }
+    .text-islam-green { color: #10B981; }
+    .border-islam-gold { border-color: #C5A059; }
+</style>
+
+
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 print:hidden">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-2xl rounded-3xl border border-gray-100 dark:border-slate-800 p-2 flex flex-col items-center">
+        <button onclick="changeFontSize(2)" class="p-3 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-2xl transition text-gray-600 dark:text-gray-300">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+        <button onclick="changeFontSize(-2)" class="p-3 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-2xl transition text-gray-600 dark:text-gray-300">
+            <i class="fa-solid fa-minus"></i>
+        </button>
+        <div class="w-8 h-[1px] bg-gray-100 dark:bg-slate-800 my-1"></div>
+        <button onclick="toggleTranslation()" id="trans-btn" class="p-3 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-2xl transition" title="เปิด/ปิด คำแปล">
+            <i class="fa-solid fa-language text-xl"></i>
+        </button>
+        <button onclick="toggleNightMode()" class="p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition">
+            <i class="fa-solid fa-moon text-xl" id="theme-icon"></i>
+        </button>
+    </div>
+</div>
+
+<div id="quran-reader-container" class="min-h-screen transition-colors duration-500 bg-[#FAFAFA] dark:bg-[#0B1120]">
+    
+    <div class="relative bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 pt-16 pb-12 px-6 text-center overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
+            <i class="fa-solid fa-mosque text-[20rem]"></i>
+        </div>
+        
+        <div id="chapter-header" class="relative z-10 opacity-0 transition-all duration-1000 transform translate-y-4">
+            <h2 id="chapter-arabic" class="font-arabic text-7xl md:text-8xl text-amber-600 dark:text-amber-500 mb-4 drop-shadow-sm"></h2>
+            <h3 id="chapter-name" class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-2"></h3>
+            <p id="chapter-info" class="text-xs font-bold tracking-[0.3em] text-slate-400 uppercase"></p>
+            
+            <div class="mt-8 inline-flex p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-inner">
+                <button onclick="changeLang('33')" class="lang-btn px-6 py-2 rounded-xl text-sm font-bold transition active-lang" data-lang="33">ไทย</button>
+                <button onclick="changeLang('39')" class="lang-btn px-6 py-2 rounded-xl text-sm font-bold transition" data-lang="39">MY</button>
+                <button onclick="changeLang('131')" class="lang-btn px-6 py-2 rounded-xl text-sm font-bold transition" data-lang="131">EN</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto py-8 px-4 md:px-6">
+        <div id="verse-list" class="space-y-4 relative">
+            </div>
+
+        <div id="loading" class="text-center py-12">
+            <div class="inline-block w-8 h-8 border-3 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
+            <p class="text-xs text-slate-400 mt-4 font-bold tracking-widest uppercase">กำลังโหลดอายะฮ์...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+    
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-arabic { font-family: 'Amiri', serif; }
+    
+    .verse-row {
+        @apply bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 border border-transparent transition-all duration-500 shadow-sm;
+    }
+
+    .verse-row.playing {
+        @apply border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-900/10 scale-[1.01] shadow-xl shadow-amber-500/10;
+    }
+
+    .arabic-text {
+        line-height: 2.2;
+        word-spacing: 4px;
+        @apply text-slate-800 dark:text-slate-100;
+    }
+
+    .active-lang {
+        @apply bg-white dark:bg-slate-700 shadow-md text-amber-600 dark:text-amber-400;
+    }
+
+    .hidden-translation .translation-text { display: none; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { @apply bg-amber-500/20 rounded-full; }
+</style>
+
+<script>
+    const chapterId = "{{ chapter_id }}";
+    let currentFontSize = parseInt(localStorage.getItem('quran_font_size')) || 38;
+    let currentLang = localStorage.getItem('quran_lang') || '33';
+    let isTranslationVisible = localStorage.getItem('show_translation') !== 'false';
+    
+    // Infinite Scroll Logic
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+    let allVerses = [];
+    let currentAudio = null;
+
+    async function loadQuranDetail() {
+        try {
+            const chapRes = await fetch(`https://api.quran.com/api/v4/chapters/${chapterId}?language=th`);
+            const chapData = await chapRes.json();
+            const ch = chapData.chapter;
+
+            document.getElementById('chapter-arabic').innerText = ch.name_arabic;
+            document.getElementById('chapter-name').innerText = ch.name_simple;
+            document.getElementById('chapter-info').innerText = `${ch.revelation_place} • ${ch.verses_count} Verses`;
+            document.getElementById('chapter-header').classList.remove('opacity-0', 'translate-y-4');
+
+            applyTranslationStatus();
+            await fetchNextPage();
+            
+            // Setup Intersection Observer
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !isLoading && hasMore) {
+                    fetchNextPage();
+                }
+            }, { rootMargin: '400px' });
+            observer.observe(document.getElementById('loading'));
+
+        } catch (error) { console.error("Error:", error); }
+    }
+
+    async function fetchNextPage() {
+        if (isLoading || !hasMore) return;
+        isLoading = true;
+        document.getElementById('loading').style.opacity = '1';
+
+        try {
+            const res = await fetch(`https://api.quran.com/api/v4/verses/by_chapter/${chapterId}?language=en&words=false&translations=${currentLang}&audio=7&fields=text_uthmani&page=${currentPage}&per_page=10`);
+            const data = await res.json();
+            
+            if (data.verses.length === 0) {
+                hasMore = false;
+            } else {
+                allVerses = [...allVerses, ...data.verses];
+                renderVerses(data.verses);
+                currentPage++;
+                if (data.pagination.next_page === null) hasMore = false;
+            }
+        } catch (e) { console.error(e); }
+        finally {
+            isLoading = false;
+            if (!hasMore) document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    function renderVerses(verses) {
+        const container = document.getElementById('verse-list');
+        const html = verses.map((v) => {
+            const globalIndex = allVerses.findIndex(av => av.verse_key === v.verse_key);
+            return `
+                <div id="verse-${v.verse_number}" class="verse-row group">
+                    <div class="flex flex-col">
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="flex flex-col space-y-3 opacity-0 group-hover:opacity-100 transition-all">
+                                <button onclick="playAudio(${globalIndex})" class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30 active:scale-95 transition">
+                                    <i class="fa-solid fa-play translate-x-0.5" id="icon-${v.verse_number}"></i>
+                                </button>
+                                <button onclick="saveBookmark('${v.verse_number}')" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 text-slate-400 flex items-center justify-center hover:text-blue-500 transition shadow-sm">
+                                    <i class="fa-solid fa-bookmark text-sm"></i>
+                                </button>
+                            </div>
+                            <p class="font-arabic text-right arabic-text flex-1 ml-10" dir="rtl" style="font-size: ${currentFontSize}px">
+                                ${v.text_uthmani} 
+                                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 text-xs font-bold mr-4 text-amber-600 border border-amber-100 dark:border-amber-900/50">
+                                    ${v.verse_number}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="translation-text mt-4 pl-1 pb-2 border-l-2 border-amber-500/20 ml-2">
+                            <p class="text-slate-500 dark:text-slate-400 leading-relaxed text-lg font-medium pl-6">
+                                ${v.translations[0].text}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function toggleTranslation() {
+        isTranslationVisible = !isTranslationVisible;
+        localStorage.setItem('show_translation', isTranslationVisible);
+        applyTranslationStatus();
+    }
+
+    function applyTranslationStatus() {
+        const container = document.getElementById('verse-list');
+        const btn = document.getElementById('trans-btn');
+        if (isTranslationVisible) {
+            container.classList.remove('hidden-translation');
+            btn.classList.add('text-amber-600');
+        } else {
+            container.classList.add('hidden-translation');
+            btn.classList.remove('text-amber-600');
+        }
+    }
+
+    function playAudio(index) {
+        const v = allVerses[index];
+        if (currentAudio) {
+            currentAudio.pause();
+            document.querySelectorAll('.verse-row').forEach(r => r.classList.remove('playing'));
+            document.querySelectorAll('[id^="icon-"]').forEach(i => i.className = 'fa-solid fa-play');
+        }
+
+        currentAudio = new Audio(`https://verses.quran.com/${v.audio.url}`);
+        const currentRow = document.getElementById(`verse-${v.verse_number}`);
+        const currentIcon = document.getElementById(`icon-${v.verse_number}`);
+
+        currentRow.classList.add('playing');
+        currentIcon.className = 'fa-solid fa-pause';
+        currentAudio.play();
+
+        currentAudio.onended = () => {
+            currentRow.classList.remove('playing');
+            currentIcon.className = 'fa-solid fa-play';
+            if (index + 1 < allVerses.length) {
+                playAudio(index + 1);
+                document.getElementById(`verse-${allVerses[index+1].verse_number}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
+    }
+
+    function changeLang(langId) {
+        currentLang = langId;
+        localStorage.setItem('quran_lang', langId);
+        document.getElementById('verse-list').innerHTML = '';
+        allVerses = []; currentPage = 1; hasMore = true;
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active-lang', btn.dataset.lang === langId));
+        fetchNextPage();
+    }
+
+    function changeFontSize(delta) {
+        currentFontSize = Math.min(Math.max(currentFontSize + delta, 24), 70);
+        document.querySelectorAll('.arabic-text').forEach(p => p.style.fontSize = currentFontSize + 'px');
+        localStorage.setItem('quran_font_size', currentFontSize);
+    }
+
+    function toggleNightMode() {
+        const isDark = document.body.classList.toggle('dark');
+        localStorage.setItem('quran_theme', isDark ? 'dark' : 'light');
+        document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun text-xl' : 'fa-solid fa-moon text-xl';
+    }
+
+    function saveBookmark(vNum) {
+        const bookmark = { chapterId, verseNum: vNum, timestamp: new Date().getTime() };
+        localStorage.setItem('quran_bookmark', JSON.stringify(bookmark));
+        alert(`บันทึกบุ๊กมาร์กอายะฮ์ที่ ${vNum} แล้ว`);
+    }
+
+    if (localStorage.getItem('quran_theme') === 'dark') {
+        document.body.classList.add('dark');
+        document.getElementById('theme-icon').className = 'fa-solid fa-sun text-xl';
+    }
+
+    loadQuranDetail();
+</script>
+{% endblock %}

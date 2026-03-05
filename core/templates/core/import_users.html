@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-10 px-4">
+    <div class="bg-white rounded-3xl shadow-xl p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">นำเข้าผู้ใช้งาน 👥</h2>
+            <a href="{% url 'download_user_template' %}" class="text-sm bg-green-50 text-green-600 px-4 py-2 rounded-xl border border-green-200 hover:bg-green-100 transition">
+                📥 ดาวน์โหลด Template
+            </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center hover:border-indigo-400 transition cursor-pointer">
+                <input type="file" name="excel_file" class="hidden" id="excel_file" accept=".xlsx">
+                <label for="excel_file" class="cursor-pointer">
+                    <span class="text-4xl mb-2 block">📄</span>
+                    <span class="text-gray-500">คลิกเพื่อเลือกไฟล์ Excel หรือลากไฟล์มาวางที่นี่</span>
+                </label>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition">
+                เริ่มนำเข้าข้อมูลทั้งหมด
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

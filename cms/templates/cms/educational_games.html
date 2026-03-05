@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}เกมสำหรับการเรียนรู้ | Smart School{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    
+    <div class="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-[3rem] p-10 md:p-20 mb-12 text-white text-center relative overflow-hidden shadow-2xl shadow-indigo-200">
+        <div class="relative z-10">
+            <div class="inline-block bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-6">
+                Gamified Learning Experience
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-6">เรียนสนุก ได้ความรู้</h1>
+            <p class="text-xl text-indigo-100 max-w-2xl mx-auto font-medium">
+                เปลี่ยนบทเรียนที่ยากให้กลายเป็นการผจญภัยที่น่าตื่นเต้น ท้าทายทักษะ และสะสมคะแนนเพื่อแลกรับรางวัล
+            </p>
+        </div>
+        
+        <i class="fa-solid fa-gamepad absolute top-10 left-10 text-8xl opacity-10 -rotate-12"></i>
+        <i class="fa-solid fa-puzzle-piece absolute bottom-10 right-10 text-8xl opacity-10 rotate-12"></i>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-16">
+        <div class="lg:col-span-3">
+            <h2 class="text-3xl font-black text-gray-800 mb-8 flex items-center">
+                <i class="fa-solid fa-rocket mr-4 text-orange-500"></i> เกมแนะนำยอดนิยม
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-xl hover:shadow-2xl transition duration-300">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="/static/images/game-physics.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-4 left-6 text-white">
+                            <span class="bg-orange-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase">Physics</span>
+                            <h3 class="text-xl font-bold mt-2">ตะลุยห้องแล็บฟิสิกส์</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex -space-x-2">
+                                <div class="h-8 w-8 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-bold">ST</div>
+                                <div class="h-8 w-8 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-[10px] font-bold">MS</div>
+                            </div>
+                            <span class="text-xs font-bold text-gray-400"><i class="fa-solid fa-users mr-1"></i> 1.2k เล่นแล้ว</span>
+                        </div>
+                        <a href="#" class="block w-full text-center bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition active:scale-95">เริ่มเล่นเกม</a>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-xl hover:shadow-2xl transition duration-300">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="/static/images/game-iot.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-4 left-6 text-white">
+                            <span class="bg-blue-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase">Technology</span>
+                            <h3 class="text-xl font-bold mt-2">พิชิตภารกิจ IoT</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex -space-x-2">
+                                <div class="h-8 w-8 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[10px] font-bold">AI</div>
+                            </div>
+                            <span class="text-xs font-bold text-gray-400"><i class="fa-solid fa-users mr-1"></i> 850 เล่นแล้ว</span>
+                        </div>
+                        <a href="#" class="block w-full text-center bg-blue-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-100 hover:bg-blue-700 transition active:scale-95">เริ่มเล่นเกม</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl">
+            <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center">
+                <i class="fa-solid fa-trophy mr-3 text-amber-500"></i> อันดับสูงสุด
+            </h3>
+            <div class="space-y-6">
+                <div class="flex items-center">
+                    <span class="text-2xl font-black text-amber-500 mr-4 italic">#1</span>
+                    <div class="flex-grow">
+                        <p class="font-bold text-gray-800 leading-none">น้องสมาน</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">ม.3/1</p>
+                    </div>
+                    <span class="text-sm font-black text-blue-600">2,500</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-2xl font-black text-gray-300 mr-4 italic">#2</span>
+                    <div class="flex-grow">
+                        <p class="font-bold text-gray-800 leading-none">ฟาติมะห์</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">ม.1/2</p>
+                    </div>
+                    <span class="text-sm font-black text-blue-600">2,120</span>
+                </div>
+                <div class="flex items-center border-b pb-6 border-gray-50">
+                    <span class="text-2xl font-black text-amber-700 mr-4 italic">#3</span>
+                    <div class="flex-grow">
+                        <p class="font-bold text-gray-800 leading-none">อับดุล</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">ม.4/1</p>
+                    </div>
+                    <span class="text-sm font-black text-blue-600">1,980</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 text-xs font-bold text-blue-600 hover:underline">ดูอันดับทั้งหมด</button>
+        </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-[3rem] p-10">
+        <h2 class="text-2xl font-black text-gray-800 mb-8">หมวดหมู่เกม</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <a href="#" class="bg-white p-6 rounded-3xl text-center border border-gray-100 hover:shadow-lg transition">
+                <i class="fa-solid fa-language text-3xl text-blue-500 mb-3"></i>
+                <span class="block font-bold text-gray-700">คำศัพท์ภาษา</span>
+            </a>
+            <a href="#" class="bg-white p-6 rounded-3xl text-center border border-gray-100 hover:shadow-lg transition">
+                <i class="fa-solid fa-calculator text-3xl text-rose-500 mb-3"></i>
+                <span class="block font-bold text-gray-700">คณิตคิดเร็ว</span>
+            </a>
+            <a href="#" class="bg-white p-6 rounded-3xl text-center border border-gray-100 hover:shadow-lg transition">
+                <i class="fa-solid fa-dna text-3xl text-emerald-500 mb-3"></i>
+                <span class="block font-bold text-gray-700">วิทย์อัจฉริยะ</span>
+            </a>
+            <a href="#" class="bg-white p-6 rounded-3xl text-center border border-gray-100 hover:shadow-lg transition">
+                <i class="fa-solid fa-kaaba text-3xl text-amber-500 mb-3"></i>
+                <span class="block font-bold text-gray-700">ตอบปัญหาศาสนา</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

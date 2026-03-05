@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}หลักสูตรการเรียนรู้ | Smart School{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    
+    <div class="text-center mb-16">
+        <span class="text-blue-600 font-black uppercase tracking-widest text-sm bg-blue-50 px-4 py-2 rounded-full">Academic Excellence</span>
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mt-6 mb-4">หลักสูตรการเรียนรู้</h1>
+        <p class="text-xl text-gray-500 max-w-3xl mx-auto font-medium">
+            บูรณาการวิชาการสามัญ จริยธรรมอิสลาม และทักษะเทคโนโลยีแห่งอนาคต เพื่อการพัฒนาที่รอบด้าน
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-50 text-center hover:translate-y-[-5px] transition">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-book-quran text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">จริยธรรมและศาสนา</h3>
+            <p class="text-gray-500 text-sm">เน้นการอ่านอัลกุรอาน ภาษาอาหรับ และการประยุกต์ใช้หลักศาสนาในชีวิตประจำวัน</p>
+        </div>
+        <div class="bg-blue-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-100 text-center hover:translate-y-[-5px] transition">
+            <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-microscope text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">วิชาการเข้มแข็ง</h3>
+            <p class="text-blue-100 text-sm">หลักสูตรแกนกลางที่เน้นวิทย์-คณิต และทักษะภาษาอังกฤษเพื่อการสื่อสารระดับสากล</p>
+        </div>
+        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-50 text-center hover:translate-y-[-5px] transition">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-robot text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">นวัตกรรมและ AI</h3>
+            <p class="text-gray-500 text-sm">การเรียนรู้ Coding, IoT และ AI ในชีวิตประจำวัน เพื่อเตรียมพร้อมสู่ยุคดิจิทัล</p>
+        </div>
+    </div>
+
+    <div class="space-y-12">
+        <h2 class="text-3xl font-black text-gray-800 flex items-center">
+            <i class="fa-solid fa-graduation-cap mr-4 text-blue-600"></i> ระดับการศึกษาที่เปิดสอน
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="group relative bg-white rounded-[3rem] overflow-hidden border border-gray-100 shadow-lg">
+                <div class="h-4 bg-blue-500 w-full"></div>
+                <div class="p-10">
+                    <h3 class="text-2xl font-black text-gray-800 mb-4">มัธยมศึกษาตอนต้น (ม.1 - ม.3)</h3>
+                    <p class="text-gray-500 mb-6 font-medium">เน้นการสำรวจความถนัด ปูพื้นฐานทักษะการคิดวิเคราะห์ และภาษา</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center text-gray-700 font-bold">
+                            <i class="fa-solid fa-star text-amber-500 mr-3"></i> หลักสูตร AI และวิทยาการคำนวณพื้นฐาน
+                        </li>
+                        <li class="flex items-center text-gray-700 font-bold">
+                            <i class="fa-solid fa-star text-amber-500 mr-3"></i> โปรแกรมเน้นทักษะภาษา (English Focus)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="group relative bg-white rounded-[3rem] overflow-hidden border border-gray-100 shadow-lg">
+                <div class="h-4 bg-indigo-600 w-full"></div>
+                <div class="p-10">
+                    <h3 class="text-2xl font-black text-gray-800 mb-4">มัธยมศึกษาตอนปลาย (ม.4 - ม.6)</h3>
+                    <p class="text-gray-500 mb-6 font-medium">เตรียมความพร้อมสู่มหาวิทยาลัย ด้วยแผนการเรียนที่หลากหลาย</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                            <span class="text-blue-600 font-black block">วิทย์-คณิต</span>
+                            <span class="text-xs text-gray-400">Science-Math</span>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                            <span class="text-emerald-600 font-black block">ภาษา-ศาสนา</span>
+                            <span class="text-xs text-gray-400">Arts-Islamic</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-20 bg-gray-900 rounded-[3rem] p-10 text-center relative overflow-hidden">
+        <div class="relative z-10">
+            <h2 class="text-3xl font-black text-white mb-6">สนใจร่วมเป็นส่วนหนึ่งกับเรา?</h2>
+            <p class="text-gray-400 mb-8 max-w-xl mx-auto">เปิดรับสมัครนักเรียนใหม่ประจำปีการศึกษา 2569 แล้ววันนี้ สอบถามรายละเอียดเพิ่มเติมได้ที่ฝ่ายทะเบียน</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition active:scale-95">สมัครเรียนออนไลน์</a>
+                <a href="#" class="bg-white/10 text-white backdrop-blur-md px-8 py-4 rounded-2xl font-bold border border-white/20 hover:bg-white/20 transition active:scale-95">ดาวน์โหลดระเบียบการ</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
